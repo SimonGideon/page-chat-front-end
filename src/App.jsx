@@ -1,6 +1,7 @@
 import React from "react";
 import { Home, Login } from "./components/Pages";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
 import "./App.css";
 
 const App = () => {
@@ -17,6 +18,7 @@ const App = () => {
   ]);
   return (
     <React.StrictMode>
+      <Toaster />
       <RouterProvider router={router} />
     </React.StrictMode>
   );
