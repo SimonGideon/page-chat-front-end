@@ -1,5 +1,5 @@
 import React from "react";
-import { Home } from "./components/Pages";
+import { Home, Login } from "./components/Pages";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./App.css";
 
@@ -8,6 +8,11 @@ const App = () => {
     {
       path: "/",
       element: <Home />,
+    },
+
+    {
+      path: "/signin",
+      element: <Login />,
     },
   ]);
   return (
