@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import axios from "axios";
 
 import {
   Button,
@@ -31,18 +32,54 @@ const Login = () => {
       password: "",
     },
   });
+  async function onSubmit(data) {
+    try {
+      const response = await axios.post("http://localhost:4000/login", {
+        user: {
+          email: data.email,
+          password: data.password,
+        },
+      });
 
-  const onSubmit = (data) => {
-    console.log(data);
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
-  };
+      // Handle the response from the server
+      if (response.status === 200) {
+        toast({
+          title: "Login Successful",
+          description: "You have successfully logged in.",
+        });
+      } else {
+        toast({
+          title: "Login Failed",
+          description: "Invalid email or password.",
+        });
+      }
+    } catch (error) {
+      if (error.response) {
+        if (error.response.status === 401) {
+          toast({
+            title: "Login Failed",
+            description: "Invalid email or password.",
+          });
+        } else {
+          toast({
+            title: "Login Failed",
+            description:
+              error.response.data.message || "An error occurred during login.",
+          });
+        }
+      } else if (error.request) {
+        toast({
+          title: "Login Failed",
+          description: "No response received from the server.",
+        });
+      } else {
+        toast({
+          title: "Login Failed",
+          description: "An error occurred while sending the request.",
+        });
+      }
+    }
+  }
 
   return (
     <Form {...form}>
