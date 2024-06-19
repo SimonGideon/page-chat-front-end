@@ -24,7 +24,7 @@ const FormSchema = z.object({
     .min(6, { message: "Password must be at least 6 characters" }),
 });
 
-const Login = () => {
+const LoginForm = () => {
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -32,6 +32,7 @@ const Login = () => {
       password: "",
     },
   });
+
   async function onSubmit(data) {
     try {
       const response = await axios.post("http://localhost:4000/login", {
@@ -82,58 +83,52 @@ const Login = () => {
   }
 
   return (
-    <div className="max-w-md mx-auto p-8 bg-white shadow-md rounded-lg">
-      <h1 className="text-3xl font-bold">Login</h1>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="w-2/3 space-y-6"
-        >
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="block text-sm font-medium text-gray-700">
-                  Email
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="example@example.com"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="block text-sm font-medium text-gray-700">
-                  Password
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="********"
-                    {...field}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="block text-sm font-medium text-gray-700">
+                Email
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="example@example.com"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="block text-sm font-medium text-gray-700">
+                Password
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="password"
+                  placeholder="********"
+                  {...field}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          <Button type="submit">Submit</Button>
-        </form>
-      </Form>
-    </div>
+        <Button type="submit">Submit</Button>
+      </form>
+    </Form>
   );
 };
 
-export default Login;
+export default LoginForm;

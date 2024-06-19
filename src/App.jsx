@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, Login } from "./components/Pages";
+import { Home, Login } from "./Pages";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import "./App.css";
