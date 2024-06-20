@@ -46,11 +46,13 @@ const LoginForm = () => {
       if (response.status === 200) {
         toast({
           title: "Login Successful",
+          variant: "success",
           description: "You have successfully logged in.",
         });
       } else {
         toast({
           title: "Login Failed",
+          variant: "destructive",
           description: "Invalid email or password.",
         });
       }
@@ -59,11 +61,13 @@ const LoginForm = () => {
         if (error.response.status === 401) {
           toast({
             title: "Login Failed",
+            variant: "destructive",
             description: "Invalid email or password.",
           });
         } else {
           toast({
             title: "Login Failed",
+            variant: "destructive",
             description:
               error.response.data.message || "An error occurred during login.",
           });
@@ -71,11 +75,13 @@ const LoginForm = () => {
       } else if (error.request) {
         toast({
           title: "Login Failed",
+          variant: "destructive",
           description: "No response received from the server.",
         });
       } else {
         toast({
           title: "Login Failed",
+          variant: "destructive",
           description: "An error occurred while sending the request.",
         });
       }
@@ -83,8 +89,8 @@ const LoginForm = () => {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
+    <Form {...form} className="w-full border-stone-950">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
         <FormField
           control={form.control}
           name="email"
@@ -96,7 +102,7 @@ const LoginForm = () => {
               <FormControl>
                 <Input
                   placeholder="example@example.com"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="text-gray-400 mt-1 block border-gray-500 shadow-sm focus:border-downy focus:ring focus:ring-downy-200 focus:ring-opacity-50"
                   {...field}
                 />
               </FormControl>
@@ -117,7 +123,7 @@ const LoginForm = () => {
                   type="password"
                   placeholder="********"
                   {...field}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="text-gray-400 mt-1 block w-full rounded-md border-gray-500 shadow-sm focus:border-downy focus:ring focus:ring-downy-200 focus:ring-opacity-50"
                 />
               </FormControl>
               <FormMessage />
@@ -125,7 +131,9 @@ const LoginForm = () => {
           )}
         />
 
-        <Button type="submit">Submit</Button>
+        <Button type="submit" className="bg-downy text-white hover:bg-spray">
+          Submit
+        </Button>
       </form>
     </Form>
   );

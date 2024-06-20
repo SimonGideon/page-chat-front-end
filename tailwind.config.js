@@ -20,6 +20,16 @@ module.exports = {
     },
     extend: {
       colors: {
+        persianRed: "#d43231",
+        bostonBlue: "#2e9cbb",
+        downy: "#6dbcd2",
+        pampas: " #ebe8e0",
+        sycamore: "#9b823e",
+        loblolly: "#b1c2c8",
+        nevada: "#69757c",
+        shark: "#262828",
+        osloGray: "#899092",
+        spray: "#8be4f4",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
