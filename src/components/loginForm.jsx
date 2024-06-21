@@ -3,7 +3,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "@/redux/features/authSlice";
 
 import {
   Button,
@@ -32,61 +33,28 @@ const LoginForm = () => {
       password: "",
     },
   });
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.auth);
 
-  async function onSubmit(data) {
-    try {
-      const response = await axios.post("http://localhost:4000/login", {
-        user: {
-          email: data.email,
-          password: data.password,
-        },
-      });
-
-      // Handle the response from the server
-      if (response.status === 200) {
+  const onSubmit = (data) => {
+    dispatch(login(data))
+      .unwrap()
+      .then(() => {
         toast({
           title: "Login Successful",
           variant: "success",
           description: "You have successfully logged in.",
         });
-      } else {
+        // Additional actions after login success
+      })
+      .catch((err) => {
         toast({
           title: "Login Failed",
           variant: "destructive",
-          description: "Invalid email or password.",
+          description: err.message || "An error occurred during login.",
         });
-      }
-    } catch (error) {
-      if (error.response) {
-        if (error.response.status === 401) {
-          toast({
-            title: "Login Failed",
-            variant: "destructive",
-            description: "Invalid email or password.",
-          });
-        } else {
-          toast({
-            title: "Login Failed",
-            variant: "destructive",
-            description:
-              error.response.data.message || "An error occurred during login.",
-          });
-        }
-      } else if (error.request) {
-        toast({
-          title: "Login Failed",
-          variant: "destructive",
-          description: "No response received from the server.",
-        });
-      } else {
-        toast({
-          title: "Login Failed",
-          variant: "destructive",
-          description: "An error occurred while sending the request.",
-        });
-      }
-    }
-  }
+      });
+  };
 
   return (
     <Form {...form} className="w-full border-stone-950">
