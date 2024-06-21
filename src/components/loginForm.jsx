@@ -28,7 +28,7 @@ const FormSchema = z.object({
 const LoginForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loading, error } = useSelector((state) => state.auth);
+  const { message } = useSelector((state) => state.auth);
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -45,16 +45,16 @@ const LoginForm = () => {
         toast({
           title: "Login Successful",
           variant: "success",
-          description: "You have successfully logged in.",
+          description: message || "You have successfully logged in.",
         });
         // Additional actions after login success
         navigate("/dashboard");
       })
-      .catch((err) => {
+      .catch(() => {
         toast({
           title: "Login Failed",
           variant: "destructive",
-          description: err.message || "An error occurred during login.",
+          description: "Invalid email or password.",
         });
       });
   };
@@ -102,8 +102,13 @@ const LoginForm = () => {
           )}
         />
 
-        <Button type="submit" className="bg-downy text-white hover:bg-spray">
-          Submit
+        <Button
+          type="submit"
+          className="bg-downy text-white hover:bg-spray"
+          // disabled={loading}
+        >
+          {/* {loading ? "Loading..." : "Submit"} */}
+          Login
         </Button>
       </form>
     </Form>

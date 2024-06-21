@@ -1,7 +1,16 @@
 import { LoginForm } from "@/components";
 import { loginBanner } from "@/assets";
-
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 const LoginPage = () => {
+  const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
   return (
     <div className="mt-10 w-2/4 mx-auto flex md:flex-row space-x-6 bg-white shadow-md rounded-lg">
       <div className="login-banner">

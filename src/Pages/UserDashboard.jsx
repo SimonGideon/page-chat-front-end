@@ -2,7 +2,9 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentUser, logout } from "@/redux/features/authSlice";
 import { Button } from "@/components/ui";
+import { Loader } from "@/components";
 import { useNavigate } from "react-router-dom";
+import { toast } from "@/components/ui";
 
 const UserDashboard = () => {
   const dispatch = useDispatch();
@@ -16,13 +18,18 @@ const UserDashboard = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+    toast({
+      title: "Logout Successful",
+      variant: "success",
+      description: "You have successfully logged out.",
+    });
     // Redirect to login page or perform additional logout actions
     navigate("/signin");
   };
 
   return (
     <div>
-      {loading && <p>Loading...</p>}
+      {loading && <Loader />}
       {error && <p>Error: {error.message}</p>}
       {user && (
         <>

@@ -39,6 +39,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
+    message: null,
     token: localStorage.getItem("token") || null,
     loading: false,
     error: null,
@@ -60,10 +61,12 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload.data;
         state.error = null;
+        state.message = action.payload.status.message;
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.message = action.payload.status.message;
       })
       .addCase(getCurrentUser.pending, (state) => {
         state.loading = true;
@@ -71,7 +74,7 @@ const authSlice = createSlice({
       })
       .addCase(getCurrentUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        state.user = action.payload.data;
         state.error = null;
       })
       .addCase(getCurrentUser.rejected, (state, action) => {

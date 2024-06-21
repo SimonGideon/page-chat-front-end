@@ -3,9 +3,9 @@ import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
 
 const ProtectedRoute = ({ children }) => {
-  const token = useSelector((state) => state.auth.token);
+  const user = useSelector((state) => state.auth.user);
 
-  if (!token) {
+  if (!user) {
     // If no token, redirect to the login page
     return <Navigate to="/signin" />;
   }

@@ -1,3 +1,4 @@
 import LoginForm from "./loginForm";
+import Loader from "./loader";
 
-export { LoginForm };
+export { LoginForm, Loader };
