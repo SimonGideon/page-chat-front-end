@@ -1,7 +1,7 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "@/redux/features/authSlice";
@@ -26,6 +26,10 @@ const FormSchema = z.object({
 });
 
 const LoginForm = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.auth);
+
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -33,8 +37,6 @@ const LoginForm = () => {
       password: "",
     },
   });
-  const dispatch = useDispatch();
-  const { loading, error } = useSelector((state) => state.auth);
 
   const onSubmit = (data) => {
     dispatch(login(data))
@@ -46,6 +48,7 @@ const LoginForm = () => {
           description: "You have successfully logged in.",
         });
         // Additional actions after login success
+        navigate("/dashboard");
       })
       .catch((err) => {
         toast({

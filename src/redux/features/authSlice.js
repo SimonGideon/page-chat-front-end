@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+// Async thunk action to login
 export const login = createAsyncThunk(
   "auth/login",
   async (userData, thunkAPI) => {
@@ -8,7 +9,26 @@ export const login = createAsyncThunk(
       const response = await axios.post("http://localhost:4000/login", {
         user: userData,
       });
-      return response.data; // Assuming response.data contains both user and token
+      const token = response.headers.authorization.split(" ")[1];
+      localStorage.setItem("token", token);
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// Async thunk action to fetch current user
+export const getCurrentUser = createAsyncThunk(
+  "auth/getCurrentUser",
+  async (_, thunkAPI) => {
+    try {
+      const response = await axios.get("http://localhost:4000/current_user", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      return response.data; // Assuming response.data contains user info
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
@@ -19,7 +39,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
-    token: null,
+    token: localStorage.getItem("token") || null,
     loading: false,
     error: null,
   },
@@ -27,6 +47,7 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.token = null;
+      localStorage.removeItem("token");
     },
   },
   extraReducers: (builder) => {
@@ -37,13 +58,25 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.data; // Assuming response.data contains user data
-        state.token = action.payload.token; // Assuming response.data contains token
+        state.user = action.payload.data;
         state.error = null;
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload; // Assuming login rejection returns error payload
+        state.error = action.payload;
+      })
+      .addCase(getCurrentUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getCurrentUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+        state.error = null;
+      })
+      .addCase(getCurrentUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
