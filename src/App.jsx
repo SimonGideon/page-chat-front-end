@@ -1,6 +1,8 @@
 import React from "react";
-import { Home } from "./components/Pages";
+import { Home, Login, UserDashboard } from "./Pages";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Toaster } from "@/components/ui/toaster";
+import { ProtectedRoute } from "@/lib";
 import "./App.css";
 
 const App = () => {
@@ -9,9 +11,23 @@ const App = () => {
       path: "/",
       element: <Home />,
     },
+
+    {
+      path: "/signin",
+      element: <Login />,
+    },
+    {
+      path: "/dashboard",
+      element: (
+        <ProtectedRoute>
+          <UserDashboard />
+        </ProtectedRoute>
+      ),
+    },
   ]);
   return (
     <React.StrictMode>
+      <Toaster />
       <RouterProvider router={router} />
     </React.StrictMode>
   );
