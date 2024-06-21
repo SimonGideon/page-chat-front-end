@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from "../utils/axiosInstance";
 
 // Async thunk action to login
 export const login = createAsyncThunk(
   "auth/login",
   async (userData, thunkAPI) => {
     try {
-      const response = await axios.post("http://localhost:4000/login", {
+      const response = await axiosInstance.post("/login", {
         user: userData,
       });
       const token = response.headers.authorization.split(" ")[1];
@@ -23,12 +23,12 @@ export const getCurrentUser = createAsyncThunk(
   "auth/getCurrentUser",
   async (_, thunkAPI) => {
     try {
-      const response = await axios.get("http://localhost:4000/current_user", {
+      const response = await axiosInstance.get("/current_user", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      return response.data; // Assuming response.data contains user info
+      return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
