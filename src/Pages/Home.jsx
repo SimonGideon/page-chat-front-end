@@ -1,8 +1,9 @@
+import { NavBar } from "@/components";
 const Home = () => {
   return (
     <div>
-      <h1>Home</h1>
-      <p>Welcome to the Home page</p>
+      <NavBar />
+      <div className="container"></div>
     </div>
   );
 };
