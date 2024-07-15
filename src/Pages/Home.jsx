@@ -14,7 +14,7 @@ const Home = () => {
 
   useEffect(() => {
     if (books) {
-      const recommended = books.filter((book) => book.is_featured);
+      const recommended = books.filter((book) => book.featured === true);
       setRecommendedBooks(recommended);
     }
   }, [books]);
