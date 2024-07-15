@@ -7,21 +7,23 @@ const Recommendations = ({ recommendedBooks }) => {
 
   return (
     <div>
-      <aside className="shadow-lg shadow-bunker-300 px-6 my-10 rounded-xl md:min-w-64 text-center">
-        <h2 className="py-6 font-semibold text-base">Recommended Reads</h2>
-        <div className="flex flex-col justify-items-center gap-4 pb-6">
+      <aside className="shadow-lg shadow-bunker-300 px-6 my-10 rounded-xl md:min-w-64 text-left">
+        <h2 className="py-6 font-semibold text-lg">Recommended</h2>
+        <div className="flex flex-col justify-items-center text-left gap-4 pb-6">
           {recommendedBooks.length === 0 ? (
             <p className="text-bunker-400">No recommended books</p>
           ) : (
-            recommended.map((book) => (
-              <div key={book.id} className="">
+            recommended.map((book, index) => (
+              <div key={book.id} className="flex gap-5">
                 <img
                   src={book.cover_image_url}
-                  className="w-48 md:w-5 max-h-4 md:max-h-72 object-cover rounded-xl"
+                  className="w-12 md:w-16 max-h-15 md:max-h-20 object-cover"
                   alt={book.title}
                 />
+                <p className="font-bold">{index + 1}</p>{" "}
                 <div className="text-bunker-400">
-                  <p className="">{book.title}</p>
+                  <p>{book.category.name}</p>
+                  <p className="text-bunker-950 font-semibold">{book.title}</p>
                   <p className="text-sm">by {book.author.name}</p>
                 </div>
               </div>
