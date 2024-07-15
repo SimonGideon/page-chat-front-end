@@ -30,7 +30,7 @@ const Home = () => {
   return (
     <div>
       <NavBar />
-      <div className="container">
+      <div className="container pt-6">
         <div className="layout-container flex h-full flex-col">
           <HeroSection />
           <div className="z-0 flex flex-col-reverse md:flex-row gap-1 md:gap-6">

@@ -14,7 +14,7 @@ const Recommendations = ({ recommendedBooks }) => {
             <p className="text-bunker-400">No recommended books</p>
           ) : (
             recommended.map((book, index) => (
-              <div key={book.id} className="flex gap-5">
+              <div key={book.id} className="flex items-center gap-5">
                 <img
                   src={book.cover_image_url}
                   className="w-12 md:w-16 max-h-15 md:max-h-20 object-cover"
