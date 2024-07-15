@@ -1,4 +1,4 @@
-import { NavBar } from "@/components";
+import { NavBar, BooksList } from "@/components";
 const Home = () => {
   return (
     <div>
@@ -73,6 +73,9 @@ const Home = () => {
                         </div>
                       </label>
                     </div>
+                  </div>
+                  <div>
+                    <BooksList />
                   </div>
                 </div>
               </div>
