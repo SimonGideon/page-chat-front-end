@@ -12,7 +12,9 @@ const NavBar = () => {
       </div>
       <div className="flex flex-end justify-between items-center gap-8">
         <div className="flex gap-2">
-          <User />
+          <span className="bg-bunker-100 rounded-full p-1">
+            <User />
+          </span>
         </div>
       </div>
     </header>
