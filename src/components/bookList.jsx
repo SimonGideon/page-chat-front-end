@@ -4,11 +4,11 @@ const BooksList = ({ books }) => {
   return (
     <section className="shadow-lg shadow-bunker-300 px-6 my-10 rounded-xl ">
       <div className="flex justify-between items-baseline">
-        <h2 className="py-6 font-semibold text-lg">Trending Now</h2>
+        <h2 className="pt-6 pb-3 font-semibold text-lg">Trending Now</h2>
         <p className="font-medium underline cursor-pointer">See All</p>
       </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-col-5 xl:grid-col-6 justify-items-center gap-4">
+      <hr />
+      <div className="grid pt-5 grid-cols-2 md:grid-cols-4 lg:grid-col-5 xl:grid-col-6 justify-items-center gap-4">
         {books &&
           books.map((book) => (
             <div key={book.id} className="">

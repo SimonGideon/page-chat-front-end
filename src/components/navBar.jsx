@@ -1,4 +1,4 @@
-import { User, BookOpen } from "react-feather";
+import { User, BookOpen, Bell } from "react-feather";
 const NavBar = () => {
   return (
     <header className="flex bg-white items-center sticky z-10  top-0 justify-between whitespace-nowrap border-b border-solid border-b-[#f0f2f4] px-10 py-3 h-16">
@@ -11,9 +11,12 @@ const NavBar = () => {
         </h2>
       </div>
       <div className="flex flex-end justify-between items-center gap-8">
-        <div className="flex gap-2">
+        <div className="flex gap-5 justify-center items-center">
+          <Bell />
           <span className="bg-bunker-100 rounded-full p-1">
-            <User />
+            <a href="/signin">
+              <User />
+            </a>
           </span>
         </div>
       </div>

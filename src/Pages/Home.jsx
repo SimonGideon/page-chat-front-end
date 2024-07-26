@@ -1,4 +1,10 @@
-import { NavBar, BooksList, HeroSection, Recommendations } from "@/components";
+import {
+  NavBar,
+  BooksList,
+  HeroSection,
+  Recommendations,
+  Loader,
+} from "@/components";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBooks } from "./../redux/features/booksSlice";
@@ -20,7 +26,7 @@ const Home = () => {
   }, [books]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
 
   if (error) {

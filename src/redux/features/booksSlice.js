@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../utils/axiosInstance";
 
 export const fetchBooks = createAsyncThunk("books/fetchBooks", async () => {
+  await new Promise((resolve) => setTimeout(resolve, 5000));
   const response = await axiosInstance.get("/books");
   return response.data.data;
 });
