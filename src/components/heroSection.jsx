@@ -27,7 +27,7 @@ const HeroSection = () => {
               className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#111318] focus:outline-0 focus:ring-0 border border-[#dcdfe5] bg-white focus:border-[#dcdfe5] h-full placeholder:text-[#636e88] px-[15px] rounded-r-none border-r-0 pr-2 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal"
               value=""
             />
-            <div className="flex items-center justify-center rounded-r-xl border-l-0 border bg-[#4da1ff] h-full cursor-pointer p-2">
+            <div className="flex items-center justify-center rounded-r-xl border-l-0 border bg-downy h-full cursor-pointer p-2">
               <div className="text-white">
                 <Search />
               </div>

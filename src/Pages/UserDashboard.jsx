@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentUser, logout } from "@/redux/features/authSlice";
 import { Button } from "@/components/ui";
-import { Loader } from "@/components";
+import { Loader, NavBar } from "@/components";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui";
 
@@ -28,17 +28,20 @@ const UserDashboard = () => {
   };
 
   return (
-    <div>
-      {loading && <Loader />}
-      {error && <p>Error: {error.message}</p>}
-      {user && (
-        <>
-          <h2>Welcome, {user.first_name}</h2>
-          <p>Email: {user.email}</p>
-        </>
-      )}
-      <Button onClick={handleLogout}>Logout</Button>
-    </div>
+    <>
+      <NavBar />
+      <div>
+        {loading && <Loader />}
+        {error && <p>Error: {error.message}</p>}
+        {user && (
+          <>
+            <h2>Welcome, {user.first_name}</h2>
+            <p>Email: {user.email}</p>
+          </>
+        )}
+        <Button onClick={handleLogout}>Logout</Button>
+      </div>
+    </>
   );
 };
 
