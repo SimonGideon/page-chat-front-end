@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 const Recommendations = ({ recommendedBooks }) => {
   // Display first 5 recommended books
   const recommended = recommendedBooks.slice(0, 5);
-  console.log(recommendedBooks);
 
   return (
     <div>

@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-const BooksList = ({ books }) => {
+const BooksList = ({ books, onTitleLength }) => {
   const chosen = books.slice(0, 12);
   return (
     <section className="shadow-lg shadow-bunker-300 px-6 my-10 rounded-xl ">
@@ -12,14 +12,14 @@ const BooksList = ({ books }) => {
       <div className="grid pt-5 grid-cols-2 md:grid-cols-4 lg:grid-col-5 xl:grid-col-6 justify-items-center gap-4">
         {chosen &&
           chosen.map((book) => (
-            <div key={book.id} className="">
+            <div key={book.id + 1} className="">
               <img
                 src={book.cover_image_url}
                 className="w-48 md:w-52 max-h-48  md:max-h-72 object-cover rounded-xl"
                 alt={book.title}
               />
               <div className="text-bunker-400">
-                <p className="">{book.title}</p>
+                <p className="">{onTitleLength(book.title)}</p>
                 <p className="text-sm">by {book.author.name}</p>
               </div>
             </div>

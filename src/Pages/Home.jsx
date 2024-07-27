@@ -18,6 +18,22 @@ const Home = () => {
     dispatch(fetchBooks());
   }, [dispatch]);
 
+  const handleTitleLength = (bookTitlle) => {
+    const unresTitle = bookTitlle.split("");
+    let res = [];
+    if (unresTitle.length > 26) {
+      for (let i = 0; i < 26; i++) {
+        res.push(unresTitle[i]);
+      }
+      res.push("...");
+      const epic = res.toString();
+
+      return epic;
+    } else {
+      return bookTitlle;
+    }
+  };
+
   useEffect(() => {
     if (books) {
       const recommended = books.filter((book) => book.featured === true);
@@ -40,7 +56,7 @@ const Home = () => {
         <div className="layout-container flex h-full flex-col">
           <HeroSection />
           <div className="z-0 flex flex-col-reverse md:flex-row gap-1 md:gap-6">
-            <BooksList books={books} />
+            <BooksList books={books} onTitleLength={handleTitleLength} />
             <Recommendations recommendedBooks={recommendedBooks} />
           </div>
         </div>
