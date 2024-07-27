@@ -1,31 +1,16 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getCurrentUser, logout } from "@/redux/features/authSlice";
-import { Button } from "@/components/ui";
+import { getCurrentUser } from "@/redux/features/authSlice";
 import { Loader, NavBar } from "@/components";
-import { useNavigate } from "react-router-dom";
-import { toast } from "@/components/ui";
 
 const UserDashboard = () => {
   const dispatch = useDispatch();
   const { user, loading, error } = useSelector((state) => state.auth);
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Fetch current user details when component mounts
     dispatch(getCurrentUser());
   }, [dispatch]);
-
-  const handleLogout = () => {
-    dispatch(logout());
-    toast({
-      title: "Logout Successful",
-      variant: "success",
-      description: "You have successfully logged out.",
-    });
-    // Redirect to login page or perform additional logout actions
-    navigate("/signin");
-  };
 
   return (
     <>
@@ -39,7 +24,6 @@ const UserDashboard = () => {
             <p>Email: {user.email}</p>
           </>
         )}
-        <Button onClick={handleLogout}>Logout</Button>
       </div>
     </>
   );
