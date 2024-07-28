@@ -72,8 +72,9 @@ const BookDetails = ({ book, onClose }) => {
               onLoadError={onLoadError}
               className="w-full overflow-hidden"
             >
-              <Page pageNumber={pageNumber} className="pdf-page" scale={2.0} />
+              <Page pageNumber={pageNumber} className="pdf-page" scale={1.5} />
             </Document>
+            <hr />
             <div className="flex justify-center mt-2 space-x-4 text-white">
               <button
                 className="px-4 py-2 bg-downy rounded"
