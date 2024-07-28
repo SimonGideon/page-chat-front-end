@@ -18,19 +18,11 @@ const Home = () => {
     dispatch(fetchBooks());
   }, [dispatch]);
 
-  const handleTitleLength = (bookTitlle) => {
-    const unresTitle = bookTitlle.split("");
-    let res = [];
-    if (unresTitle.length > 26) {
-      for (let i = 0; i < 26; i++) {
-        res.push(unresTitle[i]);
-      }
-      res.push("...");
-      const epic = res.toString();
-
-      return epic;
+  const handleTitleLength = (bookTitle) => {
+    if (bookTitle.length > 20) {
+      return bookTitle.slice(0, 20) + "...";
     } else {
-      return bookTitlle;
+      return bookTitle;
     }
   };
 

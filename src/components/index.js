@@ -4,5 +4,14 @@ import NavBar from "./navBar";
 import BooksList from "./bookList";
 import HeroSection from "./heroSection";
 import Recommendations from "./recommendations";
+import BookDetails from "./bookDetailsPop";
 
-export { LoginForm, Loader, NavBar, BooksList, Recommendations, HeroSection };
+export {
+  LoginForm,
+  Loader,
+  NavBar,
+  BooksList,
+  Recommendations,
+  HeroSection,
+  BookDetails,
+};

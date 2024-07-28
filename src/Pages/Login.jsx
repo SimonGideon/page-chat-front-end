@@ -14,7 +14,7 @@ const LoginPage = () => {
   }, [user, navigate]);
   return (
     <>
-      <div className="mt-10 w-4/5 md:w-3/4 lg:w-2/4 mx-auto flex md:flex-row sm:space-x-0 md:space-x-6 bg-white shadow-md rounded-lg">
+      <div className="mt-28 w-4/5 md:w-3/4 lg:w-2/4 mx-auto flex md:flex-row sm:space-x-0 md:space-x-6 bg-white shadow-md rounded-lg align-middle">
         <div className="hidden md:block login-banner">
           <div className="p-12">
             <h1 className="text-3xl font-bold">Welcome</h1>

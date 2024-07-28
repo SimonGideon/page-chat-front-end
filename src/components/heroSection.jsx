@@ -17,17 +17,21 @@ const HeroSection = () => {
             Discover Inspiring Faith-Based Literature
           </h2>
         </div>
-        <label className="flex flex-col min-w-40 h-14 w-full max-w-[480px] @[480px]:h-16">
+        <label className="flex flex-col min-w-40 h-14 w-full max-w-[480px] @[480px]:h-16 ">
           <div className="flex w-full flex-1 items-stretch rounded-xl h-full">
-            <div className="text-[#636e88] flex border border-[#dcdfe5] bg-white items-center justify-center pl-[15px] rounded-l-xl border-r-0">
-              <Search />
-            </div>
             <input
               placeholder="Search for books, authors, or genres"
-              className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#111318] focus:outline-0 focus:ring-0 border border-[#dcdfe5] bg-white focus:border-[#dcdfe5] h-full placeholder:text-[#636e88] px-[15px] rounded-r-none border-r-0 pr-2 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal"
+              className="form-input flex w-full min-w-0 flex-1 
+              resize-none overflow-hidden text-[#111318] focus:outline-0 
+              focus:ring-0 border border-[#dcdfe5] bg-white focus:border-[#dcdfe5] 
+              h-full placeholder:text-[#636e88] px-[15px] border-r-0 pr-2 
+               border-l-0 pl-4 text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal rounded-l-xl"
               value=""
             />
-            <div className="flex items-center justify-center rounded-r-xl border-l-0 border bg-downy h-full cursor-pointer p-2">
+            <div
+              className="flex items-center justify-center 
+            rounded-r-xl border-l-0 border bg-downy h-full cursor-pointer p-2"
+            >
               <div className="text-white">
                 <Search />
               </div>
