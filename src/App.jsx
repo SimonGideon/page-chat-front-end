@@ -3,6 +3,7 @@ import { Home, Login, UserDashboard } from "./Pages";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { ProtectedRoute } from "@/lib";
+
 import "./App.css";
 
 const App = () => {

@@ -1,8 +1,58 @@
+import {
+  NavBar,
+  BooksList,
+  HeroSection,
+  Recommendations,
+  Loader,
+} from "@/components";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchBooks } from "./../redux/features/booksSlice";
+
 const Home = () => {
+  const dispatch = useDispatch();
+  const { books, loading, error } = useSelector((state) => state.books);
+  const [recommendedBooks, setRecommendedBooks] = useState([]);
+
+  useEffect(() => {
+    dispatch(fetchBooks());
+  }, [dispatch]);
+
+  const handleTitleLength = (bookTitle) => {
+    if (bookTitle.length > 20) {
+      return bookTitle.slice(0, 20) + "...";
+    } else {
+      return bookTitle;
+    }
+  };
+
+  useEffect(() => {
+    if (books) {
+      const recommended = books.filter((book) => book.featured === true);
+      setRecommendedBooks(recommended);
+    }
+  }, [books]);
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <div>
-      <h1>Home</h1>
-      <p>Welcome to the Home page</p>
+      <NavBar />
+      <div className="container pt-6">
+        <div className="layout-container flex h-full flex-col">
+          <HeroSection />
+          <div className="z-0 flex flex-col-reverse md:flex-row gap-1 md:gap-6">
+            <BooksList books={books} onTitleLength={handleTitleLength} />
+            <Recommendations recommendedBooks={recommendedBooks} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -39,6 +39,24 @@ module.exports = {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
+        boxShadow: {
+          custom:
+            "rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px",
+        },
+        bunker: {
+          50: "#f6f7f9",
+          100: "#eceef2",
+          200: "#d4d9e3",
+          300: "#afb9ca",
+          400: "#8493ac",
+          500: "#647593",
+          600: "#505e79",
+          700: "#414c63",
+          800: "#394253",
+          900: "#333a47",
+          950: "#111318",
+        },
+
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",

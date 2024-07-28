@@ -1,6 +1,23 @@
 .login-banner {
   background-color: rgba(252, 253, 252, 255);
 }
+.pdf-page canvas {
+  width: 100% !important;
+  height: auto !important;
+}
+
+.react-pdf__Page__canvas {
+  display: block;
+  margin: 2rem auto;
+  max-width: 100%;
+  width: auto;
+}
+
+.doc-popup::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
 
 /* loader */
 .pulse {
