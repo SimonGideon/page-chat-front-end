@@ -38,7 +38,7 @@ const Recommendations = ({ recommendedBooks }) => {
 Recommendations.propTypes = {
   recommendedBooks: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number.isRequired,
+      id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
       cover_image_url: PropTypes.string.isRequired,
       author: PropTypes.shape({
