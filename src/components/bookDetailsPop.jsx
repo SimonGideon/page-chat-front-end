@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
@@ -31,7 +31,7 @@ const BookDetails = ({ book, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 overflow-auto">
-      <div className="doc-popup bg-white p-6 rounded-xl w-4/5 md:w-2/3 max-h-full overflow-y-auto mt-48 mb-20 scroll-m-2">
+      <div className="doc-popup bg-white p-6 rounded-xl w-4/5 md:w-2/3 max-h-full overflow-y-auto mt-72 mb-20 scroll-m-2">
         <div className="flex justify-between items-center">
           <h2 className="font-semibold text-lg">{book.title}</h2>
           <button className="text-bunker-400" onClick={() => onClose(false)}>
@@ -74,7 +74,6 @@ const BookDetails = ({ book, onClose }) => {
             >
               <Page pageNumber={pageNumber} className="pdf-page" scale={1.5} />
             </Document>
-            <hr />
             <div className="flex justify-center mt-2 space-x-4 text-white">
               <button
                 className="px-4 py-2 bg-downy rounded"

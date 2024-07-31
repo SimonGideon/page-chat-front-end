@@ -1,20 +1,10 @@
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { BookDetails } from "@/components";
+import { Book } from "@/components";
 
 const BooksList = ({ books, onTitleLength }) => {
-  const [showBookDetails, setShowBookDetails] = useState(false);
-  const [selectedBook, setSelectedBook] = useState(null);
-
-  // only show the first 12 books
   const chosen = books.slice(0, 12);
   const navigate = useNavigate();
-
-  const handleBookClick = (book) => {
-    setSelectedBook(book);
-    setShowBookDetails(true);
-  };
 
   return (
     <section className="shadow-lg shadow-bunker-300 px-6 my-10 rounded-xl pb-6">
@@ -30,28 +20,23 @@ const BooksList = ({ books, onTitleLength }) => {
       <hr />
       <div className="grid pt-5 grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 justify-items-center gap-4">
         {chosen.map((book) => (
-          <div
+          <Book
             key={book.id}
-            className="cursor-pointer"
-            onClick={() => handleBookClick(book)}
-          >
-            <img
-              src={book.cover_image_url}
-              className="w-48 md:w-52 sm:max-h-45 md:max-h-72 object-cover rounded-xl"
-              alt={book.title}
-            />
-            <div className="text-bunker-400">
-              <p className="text-bunker-950 font-semibold">
-                {onTitleLength(book.title)}
-              </p>
-              <p className="text-sm">by {book.author.name}</p>
-            </div>
-          </div>
+            book={book}
+            onTitleLength={onTitleLength}
+            index={0}
+            styleProps={{
+              imageClass:
+                "w-48 md:w-52 sm:max-h-45 md:max-h-72 object-cover rounded-xl",
+              textClass: "text-bunker-400",
+              containerClass: "cursor-pointer",
+              textContainer: "text-bunker-400",
+              textTitle: "text-bunker-950 font-semibold",
+              textAuthor: "text-sm",
+            }}
+          />
         ))}
       </div>
-      {showBookDetails && selectedBook && (
-        <BookDetails book={selectedBook} onClose={setShowBookDetails} />
-      )}
     </section>
   );
 };

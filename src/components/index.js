@@ -5,6 +5,7 @@ import BooksList from "./bookList";
 import HeroSection from "./heroSection";
 import Recommendations from "./recommendations";
 import BookDetails from "./bookDetailsPop";
+import Book from "./book";
 
 export {
   LoginForm,
@@ -14,4 +15,5 @@ export {
   Recommendations,
   HeroSection,
   BookDetails,
+  Book,
 };
