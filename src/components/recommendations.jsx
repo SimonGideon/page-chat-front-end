@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchRecommendedBooks } from "./../redux/features/booksSlice";
-import { Loader } from "@/components";
+import { Loader, Book } from "@/components";
 
 const Recommendations = () => {
   const dispatch = useDispatch();
@@ -35,19 +35,20 @@ const Recommendations = () => {
             <p className="text-bunker-400">No recommended books</p>
           ) : (
             recommended.map((book, index) => (
-              <div key={book.id} className="flex items-center gap-5">
-                <img
-                  src={book.cover_image_url}
-                  className="w-12 md:w-16 max-h-15 md:max-h-20 object-cover"
-                  alt={book.title}
-                />
-                <p className="font-bold">{index + 1}</p>{" "}
-                <div className="text-bunker-400">
-                  <p>{book.category.name}</p>
-                  <p className="text-bunker-950 font-semibold">{book.title}</p>
-                  <p className="text-sm">by {book.author.name}</p>
-                </div>
-              </div>
+              <Book
+                key={book.id}
+                book={book}
+                onTitleLength={(title) => title}
+                onClick={() => {}}
+                index={index + 1}
+                styleProps={{
+                  containerClass: "flex items-center gap-5",
+                  imageClass: "w-12 md:w-16 max-h-15 md:max-h-20",
+                  textClass: "text-bunker-400",
+                  textTitle: "text-bunker-950 font-semibold",
+                  indexClass: "font-bold",
+                }}
+              />
             ))
           )}
         </div>
