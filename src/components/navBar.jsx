@@ -1,4 +1,4 @@
-import { User, BookOpen, Bell, ChevronDown } from "react-feather";
+import { User, BookOpen, Bell, ChevronDown, LogOut } from "react-feather";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -92,10 +92,10 @@ const NavBar = () => {
                       </li>
                       <hr />
                       <li
-                        className="px-4 py-2 hover:bg-downy text-cyan-500 hover:text-white cursor-pointer"
+                        className="px-4 py-2 gap-1 flex hover:bg-downy text-cyan-500 hover:text-white cursor-pointer"
                         onClick={handleLogout}
                       >
-                        LOGOUT
+                        <LogOut style={{ fontSize: "0.2rem" }} /> LOGOUT
                       </li>
                     </ul>
                   </div>
