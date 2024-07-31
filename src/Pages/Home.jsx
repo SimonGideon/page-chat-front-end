@@ -5,17 +5,16 @@ import {
   Recommendations,
   Loader,
 } from "@/components";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBooks } from "./../redux/features/booksSlice";
+import { fetchFeaturedBooks } from "./../redux/features/booksSlice";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const { books, loading, error } = useSelector((state) => state.books);
-  const [recommendedBooks, setRecommendedBooks] = useState([]);
+  const { books, loading, error } = useSelector((state) => state.featured);
 
   useEffect(() => {
-    dispatch(fetchBooks());
+    dispatch(fetchFeaturedBooks());
   }, [dispatch]);
 
   const handleTitleLength = (bookTitle) => {
@@ -26,19 +25,12 @@ const Home = () => {
     }
   };
 
-  useEffect(() => {
-    if (books) {
-      const recommended = books.filter((book) => book.featured === true);
-      setRecommendedBooks(recommended);
-    }
-  }, [books]);
-
-  if (loading) {
+  if (loading || loading) {
     return <Loader />;
   }
 
-  if (error) {
-    return <div>Error: {error}</div>;
+  if (error || loading) {
+    return <div>Error: {error || loading}</div>;
   }
 
   return (
@@ -49,7 +41,7 @@ const Home = () => {
           <HeroSection />
           <div className="z-0 flex flex-col-reverse md:flex-row gap-1 md:gap-6">
             <BooksList books={books} onTitleLength={handleTitleLength} />
-            <Recommendations recommendedBooks={recommendedBooks} />
+            <Recommendations />
           </div>
         </div>
       </div>

@@ -1,6 +1,28 @@
-import PropTypes from "prop-types";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchRecommendedBooks } from "./../redux/features/booksSlice";
+import { Loader } from "@/components";
 
-const Recommendations = ({ recommendedBooks }) => {
+const Recommendations = () => {
+  const dispatch = useDispatch();
+  const {
+    books: recommendedBooks,
+    loading,
+    error,
+  } = useSelector((state) => state.recommended);
+
+  useEffect(() => {
+    dispatch(fetchRecommendedBooks());
+  }, [dispatch]);
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   // Display first 5 recommended books
   const recommended = recommendedBooks.slice(0, 5);
 
@@ -32,20 +54,6 @@ const Recommendations = ({ recommendedBooks }) => {
       </aside>
     </div>
   );
-};
-
-// Prop Types
-Recommendations.propTypes = {
-  recommendedBooks: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-      cover_image_url: PropTypes.string.isRequired,
-      author: PropTypes.shape({
-        name: PropTypes.string.isRequired,
-      }).isRequired,
-    })
-  ).isRequired,
 };
 
 export default Recommendations;
