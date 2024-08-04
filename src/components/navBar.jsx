@@ -85,10 +85,14 @@ const NavBar = () => {
                   >
                     <ul className="py-1">
                       <li className="px-4 py-2 hover:bg-downy hover:text-white cursor-pointer">
-                        Profile
+                        <a className="flex" href="/profile">
+                          Profile
+                        </a>
                       </li>
                       <li className="px-4 py-2 hover:bg-downy hover:text-white cursor-pointer">
-                        Settings
+                        <a className="flex" href="/settings">
+                          Settings
+                        </a>
                       </li>
                       <hr />
                       <li
