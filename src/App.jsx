@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, Login, UserDashboard } from "./Pages";
+import { Home, Login, UserDashboard, Profile } from "./Pages";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { ProtectedRoute } from "@/lib";
@@ -16,6 +16,10 @@ const App = () => {
     {
       path: "/signin",
       element: <Login />,
+    },
+    {
+      path: "/profile",
+      element: <Profile />,
     },
     {
       path: "/dashboard",
