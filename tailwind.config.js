@@ -24,6 +24,7 @@ module.exports = {
         bostonBlue: "#2e9cbb",
         downy: "#6dbcd2",
         pampas: " #ebe8e0",
+        body_bg: "#f5f8f8",
         sycamore: "#9b823e",
         loblolly: "#b1c2c8",
         nevada: "#69757c",
