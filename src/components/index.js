@@ -6,6 +6,7 @@ import HeroSection from "./heroSection";
 import Recommendations from "./recommendations";
 import BookDetails from "./bookDetailsPop";
 import Book from "./book";
+import HappyBirthday from "./happyBirthDay";
 
 export {
   LoginForm,
@@ -16,4 +17,5 @@ export {
   HeroSection,
   BookDetails,
   Book,
+  HappyBirthday,
 };
