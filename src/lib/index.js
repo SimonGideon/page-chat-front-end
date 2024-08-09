@@ -1,2 +1,3 @@
 import ProtectedRoute from "./services/protectedRoute";
-export { ProtectedRoute };
+import { formatDate } from "./utils";
+export { ProtectedRoute, formatDate };

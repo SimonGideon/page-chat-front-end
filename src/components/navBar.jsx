@@ -99,7 +99,8 @@ const NavBar = () => {
                         className="px-4 py-2 gap-1 flex hover:bg-downy text-cyan-500 hover:text-white cursor-pointer"
                         onClick={handleLogout}
                       >
-                        <LogOut style={{ fontSize: "0.2rem" }} /> LOGOUT
+                        <LogOut className="text-sm" />
+                        LOGOUT
                       </li>
                     </ul>
                   </div>
