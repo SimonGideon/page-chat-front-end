@@ -23,7 +23,7 @@ const Profile = () => {
     <>
       <NavBar />
       <div className="container flex flex-col md:flex-row md:gap-10 bg-gray-100 min-h-screen shadow-lg p-8 ">
-        <div className="bg-white rounded-xl w-full   md:w-1/3 shadow-lg p-6 mb-8 flex flex-col items-center">
+        <div className="bg-white rounded-[7px] w-full   md:w-1/3 shadow-lg p-6 mb-8 flex flex-col items-center">
           <div className="flex flex-col items-center justify-center">
             <h3 className="text-lg mt-3 text-downy font-bold mb-4">
               Welcome Back{userExists ? `, ${user && user.first_name}` : ""}!
