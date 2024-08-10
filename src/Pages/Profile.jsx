@@ -55,8 +55,7 @@ const Profile = () => {
                   {user.first_name} {user.last_name}
                 </h2>
                 <p className="text-gray-500 text-sm mt-2 font-normal">
-                  <span className=" text-slate-400 ">DOB:</span> {formattedDOB}{" "}
-                  <br /> 13 🚀 Reads
+                  <span>DOB:</span> {formattedDOB} <br /> 13 🚀 Reads
                 </p>
               </div>
             )}
@@ -67,12 +66,12 @@ const Profile = () => {
               <h3 className="text-lg font-semibold mb-2">
                 Contact Information
               </h3>
-              <p className="text-gray-600 mb-1">
+              <p className="text-gray-500 mb-1">
                 <span className="font-medium text-slate-400">Email:</span>
                 {"  "}
                 {user.email}
               </p>
-              <p className="text-gray-600">
+              <p className="text-gray-500">
                 <span className="font-medium text-slate-400">Phone:</span>
                 {"  "}
                 {user.phone}
@@ -85,18 +84,18 @@ const Profile = () => {
               <h3 className="text-lg font-semibold mb-2">
                 Residence Information
               </h3>
-              <p className="text-gray-600 mb-1">
+              <p className="text-gray-500 mb-1">
                 <span className="font-medium text-slate-400">
                   Area of Stay:
                 </span>{" "}
                 {user.residence}
               </p>
-              <p className="text-gray-600 mb-1">
+              <p className="text-gray-500 mb-1">
                 <span className="font-medium text-slate-400">Town</span>
                 {"  "}
                 {user.city}
               </p>
-              <p className="text-gray-600">
+              <p className="text-gray-500">
                 <span className="font-medium text-slate-400">Home Church:</span>
                 {"  "}
                 {user.home_church}
@@ -112,7 +111,7 @@ const Profile = () => {
                 />
                 <div className="text-sm text-left">
                   <p className="text-gray-800 font-semibold">Mercy Masika</p>
-                  <p className="text-gray-600">
+                  <p className="text-gray-500">
                     Zion Home Church <br /> (54 Members)
                   </p>
                 </div>
