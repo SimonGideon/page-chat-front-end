@@ -7,6 +7,7 @@ import Recommendations from "./recommendations";
 import BookDetails from "./bookDetailsPop";
 import Book from "./book";
 import HappyBirthday from "./happyBirthDay";
+import ProfileActivities from "./profileActivities";
 
 export {
   LoginForm,
@@ -18,4 +19,5 @@ export {
   BookDetails,
   Book,
   HappyBirthday,
+  ProfileActivities,
 };

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentUser } from "@/redux/features/authSlice";
-import { Loader, NavBar } from "@/components";
+import { Loader, NavBar, ProfileActivities } from "@/components";
 import { formatDate } from "../lib";
 
 const Profile = () => {
@@ -44,8 +44,8 @@ const Profile = () => {
                 </div>
               )
             ) : (
-              <div className="rounded-full h-32 w-32 flex items-center justify-center text-2xl font-semibold text-gray-700">
-                N/A
+              <div className=" animate-pulse rounded-full h-32 w-32 flex items-center justify-center text-2xl font-semibold text-gray-700">
+                {" "}
               </div>
             )}
 
@@ -120,13 +120,8 @@ const Profile = () => {
             </div>
           )}
         </div>
-        {/* Placeholder for user favorites */}
-        <div className="bg-white rounded-xl shadow-lg w-full p-6">
-          <h3 className="text-xl font-semibold mb-4">Favorites</h3>
-          <p className="text-gray-600">
-            User favorites will be displayed here.
-          </p>
-        </div>
+        {/* profile activities*/}
+        <ProfileActivities />
       </div>
     </>
   );
