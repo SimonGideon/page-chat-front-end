@@ -1,5 +1,7 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "react-feather";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchFavoriteBooks } from "./../redux/features/favoriteSlice";
 import {
   Favorite,
   Announcements,
@@ -9,8 +11,15 @@ import {
 } from "@/components";
 
 const ProfileActivities = () => {
+  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("Favorite");
+  const { user } = useSelector((state) => state.auth);
+  const { favBooks } = useSelector((state) => state.favBooks);
   const scrollRef = useRef(null);
+
+  useEffect(() => {
+    dispatch(fetchFavoriteBooks(user && user.id));
+  }, [dispatch, user]);
 
   //   scroll left button function
   const scrollLeft = () => {
@@ -44,7 +53,7 @@ const ProfileActivities = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "Favorite":
-        return <Favorite />;
+        return <Favorite favoriteBooks={favBooks} />;
       case "Notifications":
         return <Announcements />;
       case "Reviews":

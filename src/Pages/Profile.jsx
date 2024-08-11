@@ -1,17 +1,9 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getCurrentUser } from "@/redux/features/authSlice";
+import { useSelector } from "react-redux";
 import { Loader, NavBar, ProfileActivities } from "@/components";
 import { formatDate } from "../lib";
 
 const Profile = () => {
-  const dispatch = useDispatch();
   const { user, loading, error } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    // Fetch current user details when component mounts
-    dispatch(getCurrentUser());
-  }, [dispatch]);
 
   // Check if user exists once
   const userExists = user !== null && user !== undefined;
@@ -38,7 +30,7 @@ const Profile = () => {
                   />
                 </div>
               ) : (
-                <div className="rounded-full h-20 w-20 bg-gray-200 flex items-center justify-center text-downy text-xl font-semibold">
+                <div className="rounded-full h-20 w-20 bg-gray-200 flex items-center justify-center text-gray-700 text-xl font-normal">
                   {user.first_name[0]}
                   {user.last_name[0]}
                 </div>
