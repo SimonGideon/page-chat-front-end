@@ -63,7 +63,9 @@ const NavBar = () => {
       </div>
       <div className="flex justify-between items-center gap-8">
         <div className="flex gap-5 justify-center items-center">
-          <Bell />
+          <a href="/profile/notifications">
+            <Bell className="hover:text-downy" />
+          </a>
           {user ? (
             <div className="relative">
               <div className="flex gap-1 justify-end items-baseline">
@@ -102,7 +104,7 @@ const NavBar = () => {
                         </a>
                       </li>
                       <li className="px-4 py-2 hover:bg-downy hover:text-white cursor-pointer">
-                        <a className="flex" href="/settings">
+                        <a className="flex" href="/profile/settings">
                           Settings
                         </a>
                       </li>
