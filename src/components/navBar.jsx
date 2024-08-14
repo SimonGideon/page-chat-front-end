@@ -1,4 +1,4 @@
-import { User, BookOpen, Bell, ChevronDown, LogOut } from "react-feather";
+import { BookOpen, Bell, ChevronDown, LogOut } from "react-feather";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ const NavBar = () => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const popupRef = useRef(null);
   const navigate = useNavigate();
+  console.log(user);
 
   useEffect(() => {
     // Fetch current user details when component mounts
@@ -67,10 +68,21 @@ const NavBar = () => {
             <div className="relative">
               <div className="flex gap-1 justify-end items-baseline">
                 <div
-                  className="bg-downy rounded-full p-1 cursor-pointer"
+                  className="bg-downy rounded-full p-1 text-center cursor-pointer"
                   onClick={togglePopup}
                 >
-                  <User className="text-white" />
+                  {user.avatar_url ? (
+                    <img
+                      src={user.avatar_url}
+                      alt="User Avatar"
+                      className="rounded-full h-8 w-8 object-cover"
+                    />
+                  ) : (
+                    <span className="text-white h-8 w-8 font-semibold">
+                      {user.first_name[0]}
+                      {user.last_name[0]}
+                    </span>
+                  )}
                 </div>
                 <ChevronDown
                   className={`cursor-pointer transform transition-transform ${
