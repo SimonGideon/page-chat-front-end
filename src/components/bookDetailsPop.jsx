@@ -56,7 +56,7 @@ const BookDetails = ({ book, onClose }) => {
           <div className="flex flex-col gap-4 md:w-1/2">
             <img
               src={book.cover_image_url}
-              className="w-full h-auto md:w-full object-cover rounded-xl"
+              className="w-full h-1/2 md:w-full object-cover rounded-xl "
               alt={book.title}
             />
             <div>

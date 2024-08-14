@@ -13,6 +13,7 @@ import Announcements from "./announcement";
 import Reviews from "./reviews";
 import Engagements from "./engagements";
 import Favorite from "./favorite";
+import BooksCategoryDisplay from "./booksCategoryDisplay";
 
 export {
   LoginForm,
@@ -30,4 +31,5 @@ export {
   Reviews,
   Engagements,
   Favorite,
+  BooksCategoryDisplay,
 };
