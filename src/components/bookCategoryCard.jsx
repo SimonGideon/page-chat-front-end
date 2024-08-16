@@ -12,7 +12,7 @@ const BookCategoryCard = ({ category, books }) => {
               <img
                 src={book.cover_image_url}
                 alt={book.title}
-                className="w-full h-32 object-cover rounded-lg"
+                className="w-1/2 object-cover rounded-lg"
               />
             </div>
           ))}
