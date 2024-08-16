@@ -5,6 +5,7 @@ import {
   recommendedReducer,
   featuredBooksReducer,
 } from "./features/booksSlice";
+import { favoriteBookReducer } from "./features/favoriteSlice";
 
 const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ const store = configureStore({
     books: booksReducer,
     recommended: recommendedReducer,
     featured: featuredBooksReducer,
+    favBooks: favoriteBookReducer,
   },
 });
 

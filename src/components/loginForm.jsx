@@ -106,7 +106,7 @@ const LoginForm = () => {
 
           <Button
             type="submit"
-            className="bg-downy text-white hover:bg-spray rounded py-2"
+            className="bg-downy text-white hover:bg-spray rounded py-2 w-full"
             // disabled={loading}
           >
             {/* {loading ? "Loading..." : "Submit"} */}

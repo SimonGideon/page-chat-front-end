@@ -1,17 +1,9 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getCurrentUser } from "@/redux/features/authSlice";
-import { Loader, NavBar } from "@/components";
+import { useSelector } from "react-redux";
+import { Loader, NavBar, ProfileActivities } from "@/components";
 import { formatDate } from "../lib";
 
 const Profile = () => {
-  const dispatch = useDispatch();
   const { user, loading, error } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    // Fetch current user details when component mounts
-    dispatch(getCurrentUser());
-  }, [dispatch]);
 
   // Check if user exists once
   const userExists = user !== null && user !== undefined;
@@ -23,7 +15,7 @@ const Profile = () => {
     <>
       <NavBar />
       <div className="container flex flex-col md:flex-row md:gap-10 bg-gray-100 min-h-screen shadow-lg p-8 ">
-        <div className="bg-white rounded-xl w-full   md:w-1/3 shadow-lg p-6 mb-8 flex flex-col items-center">
+        <div className="bg-white rounded-[7px] w-full   md:w-1/3 shadow-lg p-6 mb-8 flex flex-col items-center">
           <div className="flex flex-col items-center justify-center">
             <h3 className="text-lg mt-3 text-downy font-bold mb-4">
               Welcome Back{userExists ? `, ${user && user.first_name}` : ""}!
@@ -38,14 +30,14 @@ const Profile = () => {
                   />
                 </div>
               ) : (
-                <div className="rounded-full h-20 w-20 bg-gray-200 flex items-center justify-center text-downy text-xl font-semibold">
+                <div className="rounded-full h-20 w-20 bg-gray-200 flex items-center justify-center text-gray-700 text-xl font-normal">
                   {user.first_name[0]}
                   {user.last_name[0]}
                 </div>
               )
             ) : (
-              <div className="rounded-full h-32 w-32 flex items-center justify-center text-2xl font-semibold text-gray-700">
-                N/A
+              <div className=" animate-pulse rounded-full h-32 w-32 flex items-center justify-center text-2xl font-semibold text-gray-700">
+                {" "}
               </div>
             )}
 
@@ -55,8 +47,7 @@ const Profile = () => {
                   {user.first_name} {user.last_name}
                 </h2>
                 <p className="text-gray-500 text-sm mt-2 font-normal">
-                  <span className=" text-slate-400 ">DOB:</span> {formattedDOB}{" "}
-                  <br /> 13 🚀 Reads
+                  <span>DOB:</span> {formattedDOB} <br /> 13 🚀 Reads
                 </p>
               </div>
             )}
@@ -67,12 +58,12 @@ const Profile = () => {
               <h3 className="text-lg font-semibold mb-2">
                 Contact Information
               </h3>
-              <p className="text-gray-600 mb-1">
+              <p className="text-gray-500 mb-1">
                 <span className="font-medium text-slate-400">Email:</span>
                 {"  "}
                 {user.email}
               </p>
-              <p className="text-gray-600">
+              <p className="text-gray-500">
                 <span className="font-medium text-slate-400">Phone:</span>
                 {"  "}
                 {user.phone}
@@ -85,18 +76,18 @@ const Profile = () => {
               <h3 className="text-lg font-semibold mb-2">
                 Residence Information
               </h3>
-              <p className="text-gray-600 mb-1">
+              <p className="text-gray-500 mb-1">
                 <span className="font-medium text-slate-400">
                   Area of Stay:
                 </span>{" "}
                 {user.residence}
               </p>
-              <p className="text-gray-600 mb-1">
+              <p className="text-gray-500 mb-1">
                 <span className="font-medium text-slate-400">Town</span>
                 {"  "}
                 {user.city}
               </p>
-              <p className="text-gray-600">
+              <p className="text-gray-500">
                 <span className="font-medium text-slate-400">Home Church:</span>
                 {"  "}
                 {user.home_church}
@@ -112,7 +103,7 @@ const Profile = () => {
                 />
                 <div className="text-sm text-left">
                   <p className="text-gray-800 font-semibold">Mercy Masika</p>
-                  <p className="text-gray-600">
+                  <p className="text-gray-500">
                     Zion Home Church <br /> (54 Members)
                   </p>
                 </div>
@@ -120,13 +111,8 @@ const Profile = () => {
             </div>
           )}
         </div>
-        {/* Placeholder for user favorites */}
-        <div className="bg-white rounded-xl shadow-lg w-full p-6">
-          <h3 className="text-xl font-semibold mb-4">Favorites</h3>
-          <p className="text-gray-600">
-            User favorites will be displayed here.
-          </p>
-        </div>
+        {/* profile activities*/}
+        <ProfileActivities />
       </div>
     </>
   );

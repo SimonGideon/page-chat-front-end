@@ -26,6 +26,9 @@ module.exports = {
         pampas: " #ebe8e0",
         body_bg: "#f5f8f8",
         sycamore: "#9b823e",
+        bg1_category: "#927f69",
+        bg2_category: "#927f69",
+        bg3_category: "#cba989",
         loblolly: "#b1c2c8",
         nevada: "#69757c",
         shark: "#262828",
@@ -36,10 +39,15 @@ module.exports = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        action: "#ee3730",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
+        "downy-light": "#d1e6e9",
+        "downy-dark": "#4a9ab4",
+        "downy-darker": "#367a8a",
+        "downy-lightest": "#f0f5f6",
         boxShadow: {
           custom:
             "rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px",

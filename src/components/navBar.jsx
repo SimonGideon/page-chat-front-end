@@ -1,4 +1,4 @@
-import { User, BookOpen, Bell, ChevronDown, LogOut } from "react-feather";
+import { BookOpen, Bell, ChevronDown, LogOut } from "react-feather";
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ const NavBar = () => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const popupRef = useRef(null);
   const navigate = useNavigate();
+  console.log(user);
 
   useEffect(() => {
     // Fetch current user details when component mounts
@@ -53,24 +54,39 @@ const NavBar = () => {
   return (
     <header className="flex bg-white items-center sticky z-10 top-0 justify-between whitespace-nowrap border-b border-solid border-b-[#f0f2f4] px-10 py-3 h-16">
       <div className="flex items-center gap-4 text-banker-950">
-        <div className="size-6">
-          <BookOpen />
-        </div>
-        <h2 className="text-bunker-950 text-lg font-bold leading-tight tracking-[-0.015em]">
-          FaithReads
-        </h2>
+        <a href="/" className="flex gap-2 items-center">
+          <div className="size-6">
+            <BookOpen />
+          </div>
+          <h2 className="text-bunker-950 sm-text-sm text-lg font-bold leading-tight tracking-[-0.015em]">
+            FaithReads
+          </h2>
+        </a>
       </div>
       <div className="flex justify-between items-center gap-8">
         <div className="flex gap-5 justify-center items-center">
-          <Bell />
+          <a href="/profile/notifications">
+            <Bell className="hover:text-downy" />
+          </a>
           {user ? (
             <div className="relative">
               <div className="flex gap-1 justify-end items-baseline">
                 <div
-                  className="bg-downy rounded-full p-1 cursor-pointer"
+                  className="bg-downy rounded-full p-1 text-center cursor-pointer"
                   onClick={togglePopup}
                 >
-                  <User className="text-white" />
+                  {user.avatar_url ? (
+                    <img
+                      src={user.avatar_url}
+                      alt="User Avatar"
+                      className="rounded-full h-8 w-8 object-cover"
+                    />
+                  ) : (
+                    <span className="text-white h-8 w-8 font-semibold">
+                      {user.first_name[0]}
+                      {user.last_name[0]}
+                    </span>
+                  )}
                 </div>
                 <ChevronDown
                   className={`cursor-pointer transform transition-transform ${
@@ -90,7 +106,7 @@ const NavBar = () => {
                         </a>
                       </li>
                       <li className="px-4 py-2 hover:bg-downy hover:text-white cursor-pointer">
-                        <a className="flex" href="/settings">
+                        <a className="flex" href="/profile/settings">
                           Settings
                         </a>
                       </li>

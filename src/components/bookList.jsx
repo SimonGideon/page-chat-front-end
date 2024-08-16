@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import { Book } from "@/components";
+import { Book, BooksCategoryDisplay } from "@/components";
 
 const BooksList = ({ books, onTitleLength }) => {
   const chosen = books.slice(0, 12);
@@ -18,6 +18,10 @@ const BooksList = ({ books, onTitleLength }) => {
         </p>
       </div>
       <hr />
+      <div>
+        <p className="text-bunker-400 pt-3">Featured Cartegories</p>
+        <BooksCategoryDisplay data={books} />
+      </div>
       <div className="grid pt-5 grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 justify-items-center gap-4">
         {chosen.map((book) => (
           <Book
