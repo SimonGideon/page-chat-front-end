@@ -11,7 +11,6 @@ const NavBar = () => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const popupRef = useRef(null);
   const navigate = useNavigate();
-  console.log(user);
 
   useEffect(() => {
     // Fetch current user details when component mounts
