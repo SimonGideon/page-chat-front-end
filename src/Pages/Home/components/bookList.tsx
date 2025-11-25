@@ -16,12 +16,12 @@ const BooksList = ({ books, onTitleLength }: BooksListProps) => {
   const chosen = useMemo(() => books.slice(0, 12), [books]);
 
   return (
-    <section className="shadow-lg shadow-bunker-300 px-6 my-10 rounded-xl pb-6">
-      <div className="flex justify-between items-baseline">
+    <section className="my-10 rounded-2xl border border-[#e4d5bb] bg-[#fef9f0] px-6 pb-6 shadow-sm">
+      <div className="flex items-baseline justify-between">
         <h2 className="pt-6 pb-3 font-semibold text-lg">Trending Now</h2>
         <button
           type="button"
-          className="font-medium underline cursor-pointer"
+          className="cursor-pointer rounded-full border border-transparent px-3 py-1 text-sm font-medium text-primaryAccent transition hover:border-primaryAccent"
           onClick={() => navigate("/signin")}
         >
           See All
@@ -29,7 +29,7 @@ const BooksList = ({ books, onTitleLength }: BooksListProps) => {
       </div>
       <hr />
       <div>
-        <p className="text-bunker-400 pt-3">Featured Categories</p>
+        <p className="pt-3 text-charcoal/70">Featured Categories</p>
         <BooksCategoryDisplay data={books} />
       </div>
       <div className="grid pt-5 grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 justify-items-center gap-4">

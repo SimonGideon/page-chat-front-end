@@ -62,11 +62,11 @@ const ProfileActivities = () => {
   };
 
   const getTabClassNames = (tab: Tab) => `
-    flex-shrink-0 cursor-pointer
+    flex-shrink-0 cursor-pointer px-2
     ${
       activeTab === tab
-        ? "text-action font-medium border-b-2 border-action"
-        : "text-gray-500"
+        ? "text-primaryAccent font-semibold border-b-2 border-primaryAccent"
+        : "text-charcoal/60"
     }
   `;
 
@@ -88,10 +88,10 @@ const ProfileActivities = () => {
   };
 
   return (
-    <div className="bg-white rounded-[10px] profile-activity shadow-lg w-full">
-      <div className="flex items-center justify-between mb-4 bg-downy-light rounded-t-[7px]">
+    <div className="profile-activity w-full rounded-2xl border border-[#e4d5bb] bg-[#fef9f0] shadow-sm">
+      <div className="mb-4 flex items-center justify-between rounded-t-[14px] bg-[#ffeeda] px-4 py-3">
         <div className="w-full overflow-x-auto" ref={scrollRef}>
-          <ul className="flex gap-2 md:gap-5 whitespace-nowrap">
+          <ul className="flex gap-2 whitespace-nowrap md:gap-5">
             {tabs.map((tab) => (
               <li
                 key={tab}
@@ -103,16 +103,16 @@ const ProfileActivities = () => {
             ))}
           </ul>
         </div>
-        <div className="flex items-center gap-2 ml-4 md:hidden">
+        <div className="hidden items-center gap-2 md:flex">
           <button
-            className="bg-downy text-white p-1 rounded-[5px]"
+            className="rounded-full bg-downy p-1 text-white shadow-sm"
             onClick={scrollLeft}
             type="button"
           >
             <ChevronLeft />
           </button>
           <button
-            className="bg-downy text-white p-1 rounded-[5px]"
+            className="rounded-full bg-downy p-1 text-white shadow-sm"
             onClick={scrollRight}
             type="button"
           >

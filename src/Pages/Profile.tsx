@@ -1,7 +1,7 @@
 import { Loader, NavBar } from "@/components";
 import { useAppSelector } from "@/redux/hooks";
 import { formatDate } from "@/lib";
-import { ProfileActivities } from "./components";
+import { ProfileActivities } from "./Profile/components";
 
 const Profile = () => {
   const { user, loading, error } = useAppSelector((state) => state.auth);
@@ -21,10 +21,10 @@ const Profile = () => {
   return (
     <>
       <NavBar />
-      <div className="container flex flex-col md:flex-row md:gap-10 bg-gray-100 min-h-screen shadow-lg p-8 ">
-        <div className="bg-white rounded-[7px] w-full md:w-1/3 shadow-lg p-6 mb-8 flex flex-col items-center">
+      <div className="container flex min-h-screen flex-col gap-8 bg-[#faf3e1] p-8 md:flex-row md:gap-10">
+        <div className="mb-8 flex w-full flex-col items-center rounded-2xl border border-[#e4d5bb] bg-[#fef9f0] p-6 shadow-sm md:w-1/3">
           <div className="flex flex-col items-center justify-center">
-            <h3 className="text-lg mt-3 text-downy font-bold mb-4">
+            <h3 className="mb-4 mt-3 text-lg font-bold text-primaryAccent">
               Welcome Back{userExists ? `, ${user?.first_name}` : ""}!
             </h3>
             {userExists ? (
@@ -57,9 +57,9 @@ const Profile = () => {
               </div>
             )}
           </div>
-          <hr className="w-full border-gray-300 my-2" />
+          <hr className="my-2 w-full border-[#eadfc8]" />
           {userExists && (
-            <div className="w-full rounded-lg p-4 mb-3">
+            <div className="mb-3 w-full rounded-2xl border border-[#eadfc8] bg-[#fff9ef] p-4">
               <h3 className="text-lg font-semibold mb-2">
                 Contact Information
               </h3>
@@ -75,7 +75,7 @@ const Profile = () => {
           )}
 
           {userExists && (
-            <div className="w-full rounded-lg p-2">
+            <div className="w-full rounded-2xl border border-[#eadfc8] bg-[#fff9ef] p-4">
               <h3 className="text-lg font-semibold mb-2">
                 Residence Information
               </h3>
