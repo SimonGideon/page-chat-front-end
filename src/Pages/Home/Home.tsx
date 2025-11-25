@@ -1,11 +1,7 @@
 import { useEffect } from "react";
 
-import {
-  BooksList,
-  HeroSection,
-  NavBar,
-  Recommendations,
-} from "@/components";
+import { NavBar } from "@/components";
+import { BooksList, HeroSection, Recommendations } from "./components";
 import { fetchFeaturedBooks } from "@/redux/features/booksSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 

@@ -1,8 +1,9 @@
 import { useEffect, useMemo } from "react";
 
-import { Book, Loader } from "@/components";
+import Loader from "@/components/loader";
 import { fetchRecommendedBooks } from "@/redux/features/booksSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import Book from "./book";
 
 const Recommendations = () => {
   const dispatch = useAppDispatch();

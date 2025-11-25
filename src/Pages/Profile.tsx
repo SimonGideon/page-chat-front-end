@@ -1,6 +1,7 @@
-import { Loader, NavBar, ProfileActivities } from "@/components";
+import { Loader, NavBar } from "@/components";
 import { useAppSelector } from "@/redux/hooks";
 import { formatDate } from "@/lib";
+import { ProfileActivities } from "./components";
 
 const Profile = () => {
   const { user, loading, error } = useAppSelector((state) => state.auth);

@@ -58,7 +58,7 @@ const NavBar = () => {
             <BookOpen />
           </div>
           <h2 className="text-bunker-950 text-lg font-bold leading-tight tracking-[-0.015em]">
-            Book Chat
+            Page Chat
           </h2>
         </a>
       </div>

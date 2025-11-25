@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { loginBanner, logo } from "@/assets";
-import { LoginForm } from "@/components";
 import { useAppSelector } from "@/redux/hooks";
+import LoginForm from "./Login/components/loginForm";
 
 const LoginPage = () => {
   const { user } = useAppSelector((state) => state.auth);
@@ -28,7 +28,7 @@ const LoginPage = () => {
             <img
               className="w-1/3 mb-4 md:hidden"
               src={logo}
-              alt="Book Chat logo"
+              alt="Page Chat logo"
             />
             <h1 className="self-start text-3xl font-bold mb-2">LOGIN</h1>
           </div>

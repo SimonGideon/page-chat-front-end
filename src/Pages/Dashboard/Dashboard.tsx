@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 
-import { HappyBirthday, Loader, NavBar } from "@/components";
+import { Loader, NavBar } from "@/components";
 import { useAppSelector } from "@/redux/hooks";
+import HappyBirthday from "./components/happyBirthDay";
 
-const UserDashboard = () => {
+const PageChat = () => {
   const { user, loading, error } = useAppSelector((state) => state.auth);
   const [isBirthday, setIsBirthday] = useState(false);
 
@@ -42,4 +43,4 @@ const UserDashboard = () => {
   );
 };
 
-export default UserDashboard;
+export default PageChat;

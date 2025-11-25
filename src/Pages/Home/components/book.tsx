@@ -1,7 +1,8 @@
 import { useState } from "react";
 
 import type { Book as BookType } from "@/types";
-import { BookDetails } from "@/components";
+
+import BookDetails from "./bookDetailsPop";
 
 type StyleProps = {
   containerClass?: string;
