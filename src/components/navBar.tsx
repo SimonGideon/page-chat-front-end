@@ -51,13 +51,13 @@ const NavBar = () => {
   };
 
   return (
-    <header className="flex bg-white items-center sticky z-10 top-0 justify-between whitespace-nowrap border-b border-solid border-b-[#f0f2f4] px-10 py-3 h-16">
-      <div className="flex items-center gap-4 text-bunker-950">
-        <a href="/" className="flex gap-2 items-center">
-          <div className="size-6">
+    <header className="flex h-16 items-center justify-between whitespace-nowrap border-b border-[#e5d8bf] bg-[#faf3e1e6] px-6 backdrop-blur-md">
+      <div className="flex items-center gap-4 text-charcoal">
+        <a href="/" className="flex items-center gap-2">
+          <div className="size-6 text-primaryAccent">
             <BookOpen />
           </div>
-          <h2 className="text-bunker-950 text-lg font-bold leading-tight tracking-[-0.015em]">
+          <h2 className="text-charcoal text-lg font-semibold leading-tight tracking-[-0.015em]">
             Page Chat
           </h2>
         </a>
@@ -65,14 +65,14 @@ const NavBar = () => {
       <div className="flex justify-between items-center gap-8">
         <div className="flex gap-5 justify-center items-center">
           <a href="/profile/notifications" aria-label="Notifications">
-            <Bell className="hover:text-downy" />
+            <Bell className="text-charcoal/70 transition-colors hover:text-primaryAccent" />
           </a>
           {user ? (
             <div className="relative">
               <div className="flex gap-1 justify-end items-baseline">
                 <button
                   type="button"
-                  className="bg-downy rounded-full p-1 text-center cursor-pointer"
+                  className="bg-downy rounded-full p-1 text-center text-white shadow-sm transition hover:bg-downy-dark"
                   onClick={togglePopup}
                 >
                   {user.avatar_url ? (
@@ -97,26 +97,25 @@ const NavBar = () => {
                 {isPopupVisible && (
                   <div
                     ref={popupRef}
-                    className="absolute pt-0 right-0 mt-8 w-48 bg-white rounded-md shadow-lg z-10"
+                    className="absolute right-0 mt-8 w-52 rounded-xl border border-[#efdcc2] bg-[#fef8ef] p-1 shadow-lg z-10"
                   >
-                    <ul className="py-1">
-                      <li className="px-4 py-2 hover:bg-downy hover:text-white cursor-pointer">
+                    <ul className="divide-y divide-[#efdcc2]">
+                      <li className="px-4 py-3 text-sm font-medium text-charcoal hover:bg-downy hover:text-white rounded-t-lg transition">
                         <a className="flex" href="/profile">
                           Profile
                         </a>
                       </li>
-                      <li className="px-4 py-2 hover:bg-downy hover:text-white cursor-pointer">
+                      <li className="px-4 py-3 text-sm font-medium text-charcoal hover:bg-downy hover:text-white transition">
                         <a className="flex" href="/profile/settings">
                           Settings
                         </a>
                       </li>
-                      <hr />
                       <li
-                        className="px-4 py-2 gap-1 flex hover:bg-downy text-cyan-500 hover:text-white cursor-pointer"
+                        className="px-4 py-3 flex items-center gap-2 text-primaryAccent hover:bg-downy-dark hover:text-white rounded-b-lg transition cursor-pointer"
                         onClick={handleLogout}
                       >
                         <LogOut className="text-sm" />
-                        LOGOUT
+                        Log out
                       </li>
                     </ul>
                   </div>
@@ -125,10 +124,10 @@ const NavBar = () => {
             </div>
           ) : (
             <button
-              className="bg-downy hover:bg-[#4da0ff93] text-white px-2.5 py-1.5 rounded"
+              className="rounded-full bg-downy px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-downy-dark"
               onClick={() => navigate("/signin")}
             >
-              SIGN IN
+              Sign in
             </button>
           )}
         </div>
