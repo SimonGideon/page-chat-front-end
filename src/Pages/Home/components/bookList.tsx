@@ -2,7 +2,9 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import type { Book as BookType } from "@/types";
-import { Book, BooksCategoryDisplay } from "@/components";
+
+import Book from "./book";
+import BooksCategoryDisplay from "./booksCategoryDisplay";
 
 type BooksListProps = {
   books: BookType[];

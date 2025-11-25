@@ -2,13 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "react-feather";
 import { useLocation } from "react-router-dom";
 
-import {
-  Announcements,
-  Engagements,
-  Favorite,
-  Reviews,
-  Settings,
-} from "@/components";
+import Announcements from "./announcement";
+import Engagements from "./engagements";
+import Favorite from "./favorite";
+import Reviews from "./reviews";
+import Settings from "./settings";
 import { fetchFavoriteBooks } from "@/redux/features/favoriteSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 

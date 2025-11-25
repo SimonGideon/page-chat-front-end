@@ -1,6 +1,6 @@
 import React from "react";
-import { Home, Login, UserDashboard, Profile } from "./Pages";
-import { Favorite, Announcements, Settings } from "@/components";
+import { Home, Login, PageChat, Profile } from "./Pages";
+import { Favorite, Announcements, Settings } from "./Pages/Profile/components";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { ProtectedRoute } from "@/lib";
@@ -36,10 +36,10 @@ const App = () => {
       ],
     },
     {
-      path: "/dashboard",
+      path: "/page-chat",
       element: (
         <ProtectedRoute>
-          <UserDashboard />
+          <PageChat />
         </ProtectedRoute>
       ),
     },
