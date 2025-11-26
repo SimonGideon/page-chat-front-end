@@ -6,7 +6,7 @@ import { fetchFeaturedBooks } from "@/redux/features/booksSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 
 const SkeletonBlock = ({ className }: { className: string }) => (
-  <div className={`animate-pulse rounded-xl bg-[#eadfca] ${className}`} />
+  <div className={`animate-pulse rounded-xl bg-[#f3ebdd] ${className}`} />
 );
 
 const BooksSectionSkeleton = () => (
@@ -18,7 +18,7 @@ const BooksSectionSkeleton = () => (
 );
 
 const RecommendationsSkeleton = () => (
-  <div className="min-w-[240px] space-y-4 rounded-xl border border-slate-200 p-4">
+  <div className="min-w-[240px] space-y-4 rounded-xl border border-[#f1e7d2] bg-white p-4 shadow-sm">
     <SkeletonBlock className="h-6 w-2/3" />
     {Array.from({ length: 4 }).map((_, index) => (
       <div key={index} className="flex items-center gap-3">
@@ -38,7 +38,7 @@ const HomeSkeleton = () => (
     <div className="container space-y-6 pt-6">
       <SkeletonBlock className="h-[360px] w-full" />
       <div className="flex flex-col gap-6 md:flex-row">
-        <div className="flex-1 space-y-4 rounded-2xl border border-[#e4d5bb] bg-[#fef9f0] p-4">
+        <div className="flex-1 space-y-4 rounded-2xl border border-[#f1e7d2] bg-white p-4 shadow-sm">
           <SkeletonBlock className="h-6 w-40" />
           <BooksSectionSkeleton />
         </div>
@@ -49,7 +49,7 @@ const HomeSkeleton = () => (
 );
 
 const EmptyBooksState = ({ onRetry }: { onRetry: () => void }) => (
-  <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-primaryAccent/30 bg-[#fef9f0] p-10 text-center shadow-sm">
+  <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-downy/30 bg-white p-10 text-center shadow-[0_15px_60px_rgba(34,34,34,0.06)]">
     <h3 className="text-xl font-semibold text-charcoal">
       No books available yet
     </h3>

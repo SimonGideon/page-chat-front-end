@@ -1,5 +1,13 @@
 import React from "react";
-import { Home, Login, PageChat, Profile } from "./Pages";
+import {
+  ForgotPassword,
+  Home,
+  Login,
+  PageChat,
+  Profile,
+  ResetPassword,
+  SignUp,
+} from "./Pages";
 import { Favorite, Announcements, Settings } from "./Pages/Profile/components";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -16,6 +24,18 @@ const App = () => {
     {
       path: "/signin",
       element: <Login />,
+    },
+    {
+      path: "/signup",
+      element: <SignUp />,
+    },
+    {
+      path: "/forgot-password",
+      element: <ForgotPassword />,
+    },
+    {
+      path: "/reset-password",
+      element: <ResetPassword />,
     },
     {
       path: "/profile",

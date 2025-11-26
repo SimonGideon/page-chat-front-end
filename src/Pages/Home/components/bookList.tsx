@@ -16,23 +16,30 @@ const BooksList = ({ books, onTitleLength }: BooksListProps) => {
   const chosen = useMemo(() => books.slice(0, 12), [books]);
 
   return (
-    <section className="my-10 rounded-2xl border border-[#e4d5bb] bg-[#fef9f0] px-6 pb-6 shadow-sm">
-      <div className="flex items-baseline justify-between">
-        <h2 className="pt-6 pb-3 font-semibold text-lg">Trending Now</h2>
+    <section className="relative my-10 overflow-hidden rounded-3xl border border-[#f1e7d2] bg-white px-6 pb-6 shadow-[0_25px_120px_rgba(34,34,34,0.04)]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-downy via-downy-light to-transparent" />
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-8">
+        <div>
+          <div className="inline-flex items-center gap-2 rounded-full bg-downy-lightest px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-downy-dark">
+            Trending Now
+          </div>
+          <h2 className="pt-3 text-2xl font-semibold text-charcoal">
+            Personalized picks for today
+          </h2>
+        </div>
         <button
           type="button"
-          className="cursor-pointer rounded-full border border-transparent px-3 py-1 text-sm font-medium text-primaryAccent transition hover:border-primaryAccent"
+          className="cursor-pointer rounded-full border border-downy/30 px-5 py-2 text-sm font-semibold text-downy-dark transition hover:border-downy hover:text-downy"
           onClick={() => navigate("/signin")}
         >
           See All
         </button>
       </div>
-      <hr />
       <div>
         <p className="pt-3 text-charcoal/70">Featured Categories</p>
         <BooksCategoryDisplay data={books} />
       </div>
-      <div className="grid pt-5 grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 justify-items-center gap-4">
+      <div className="grid grid-cols-2 justify-items-center gap-4 pt-5 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {chosen.map((book) => (
           <Book
             key={book.id}
