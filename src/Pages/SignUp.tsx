@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 
 import { logo } from "@/assets";
@@ -15,26 +17,43 @@ import {
   Input,
   toast,
 } from "@/components/ui";
+import GlobalDropdown from "@/components/ui/GlobalDropdown";
 import axiosInstance from "@/redux/utils/axiosInstance";
 
 const SignUpSchema = z.object({
   first_name: z.string().min(2, "First name is required"),
   last_name: z.string().min(2, "Last name is required"),
   email: z.string().email("Enter a valid email address"),
-  membership_number: z.string().min(3, "Membership number is required"),
   phone: z.string().min(6, "Phone is required"),
   address: z.string().min(3, "Address is required"),
-  city: z.string().min(2, "City is required"),
-  country: z.string().min(2, "Country is required"),
-  gender: z.string().min(1, "Gender is required"),
-  nationality: z.string().min(2, "Nationality is required"),
+  city: z.string().min(1, "City is required"),
+  country: z.string().min(1, "Country is required"),
+  gender: z.enum(["female", "male", "non_binary", "unspecified"], {
+    required_error: "Please select a gender",
+  }),
   date_of_birth: z.string().min(4, "Date of birth is required"),
 });
 
 type SignUpValues = z.infer<typeof SignUpSchema>;
 
+interface CountryOption {
+  text: string;
+  value: string;
+}
+
+interface CityOption {
+  text: string;
+  value: string;
+}
+
 const SignUp = () => {
   const navigate = useNavigate();
+  const [selectedCountryCode, setSelectedCountryCode] = useState<string>("");
+  const [countryPhoneCode, setCountryPhoneCode] = useState<string>("");
+  const [countryOptions, setCountryOptions] = useState<CountryOption[]>([]);
+  const [cityOptions, setCityOptions] = useState<CityOption[]>([]);
+  const [loadingCountries, setLoadingCountries] = useState(true);
+  const [loadingCities, setLoadingCities] = useState(false);
 
   const form = useForm<SignUpValues>({
     resolver: zodResolver(SignUpSchema),
@@ -42,21 +61,131 @@ const SignUp = () => {
       first_name: "",
       last_name: "",
       email: "",
-      membership_number: "",
       phone: "",
       address: "",
       city: "",
       country: "",
-      gender: "",
-      nationality: "",
+      gender: "unspecified",
       date_of_birth: "",
     },
   });
 
+  const selectedCountry = form.watch("country");
+
+  // Fetch countries on mount
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        setLoadingCountries(true);
+        const response = await axiosInstance.get<{
+          data: Array<{
+            id: string;
+            attributes: {
+              name: string;
+              code: string;
+              phone_code: string;
+            };
+          }>;
+        }>("/countries");
+        const options: CountryOption[] =
+          response.data.data?.map((item) => ({
+            text: item.attributes.name,
+            value: item.attributes.code,
+          })) || [];
+        setCountryOptions(options);
+      } catch (error) {
+        console.error("Failed to fetch countries:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load countries. Please refresh the page.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoadingCountries(false);
+      }
+    };
+    fetchCountries();
+  }, []);
+
+  // Fetch cities when country changes
+  useEffect(() => {
+    if (!selectedCountry) {
+      setCityOptions([]);
+      form.setValue("city", "");
+      return;
+    }
+
+    const fetchCities = async () => {
+      setLoadingCities(true);
+      try {
+        const response = await axiosInstance.get<{
+          data: Array<{
+            id: string;
+            attributes: {
+              name: string;
+              state_province?: string;
+            };
+          }>;
+        }>(`/cities?country_code=${selectedCountry}`);
+        const options: CityOption[] =
+          response.data.data?.map((item) => ({
+            text: item.attributes.state_province
+              ? `${item.attributes.name}, ${item.attributes.state_province}`
+              : item.attributes.name,
+            value: item.id,
+          })) || [];
+        setCityOptions(options);
+      } catch (error) {
+        console.error("Failed to fetch cities:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load cities. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoadingCities(false);
+      }
+    };
+
+    fetchCities();
+  }, [selectedCountry, form]);
+
+  // Fetch country phone code when country changes
+  useEffect(() => {
+    if (selectedCountry) {
+      setSelectedCountryCode(selectedCountry);
+      const fetchCountryDetails = async () => {
+        try {
+          const response = await axiosInstance.get<{
+            data: {
+              id: string;
+              attributes: {
+                name: string;
+                code: string;
+                phone_code: string;
+              };
+            };
+          }>(`/countries/${selectedCountry}`);
+          setCountryPhoneCode(response.data.data.attributes.phone_code || "");
+        } catch (error) {
+          console.error("Failed to fetch country details:", error);
+        }
+      };
+      fetchCountryDetails();
+    } else {
+      setSelectedCountryCode("");
+      setCountryPhoneCode("");
+    }
+  }, [selectedCountry]);
+
   const onSubmit = async (values: SignUpValues) => {
     try {
       await axiosInstance.post("/signup", {
-        user: values,
+        user: {
+          ...values,
+          country_code: values.country, // country is already the code from GlobalDropdown
+          city_id: values.city,
+        },
       });
 
       toast({
@@ -70,7 +199,7 @@ const SignUp = () => {
       toast({
         title: "Unable to create account",
         description:
-          "We couldn’t complete your registration. Please review your details and try again.",
+          "We couldn't complete your registration. Please review your details and try again.",
         variant: "destructive",
       });
     }
@@ -144,32 +273,13 @@ const SignUp = () => {
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem className="md:col-span-2">
+                <FormItem>
                   <FormLabel className="text-sm font-medium text-charcoal">
                     Email
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="you@example.com"
-                      className="h-12 rounded-2xl border border-[#efe6da] bg-white/90 px-4 text-charcoal placeholder:text-charcoal/50 focus:border-downy focus:ring-downy/20"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="membership_number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-charcoal">
-                    Membership number
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="M1234"
                       className="h-12 rounded-2xl border border-[#efe6da] bg-white/90 px-4 text-charcoal placeholder:text-charcoal/50 focus:border-downy focus:ring-downy/20"
                       {...field}
                     />
@@ -187,11 +297,99 @@ const SignUp = () => {
                     Phone
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="+255..."
-                      className="h-12 rounded-2xl border border-[#efe6da] bg-white/90 px-4 text-charcoal placeholder:text-charcoal/50 focus:border-downy focus:ring-downy/20"
-                      {...field}
-                    />
+                    <div className="relative">
+                      {selectedCountryCode && (
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none z-10">
+                          <img
+                            src={`https://flagsapi.com/${selectedCountryCode}/flat/64.png`}
+                            alt="Country flag"
+                            className="w-6 h-4 object-cover rounded"
+                          />
+                          {countryPhoneCode && (
+                            <span className="text-sm text-charcoal/70">
+                              {countryPhoneCode}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      <Input
+                        placeholder={
+                          countryPhoneCode
+                            ? `${countryPhoneCode} ...`
+                            : "+255..."
+                        }
+                        className={`h-12 rounded-2xl border border-[#efe6da] bg-white/90 px-4 text-charcoal placeholder:text-charcoal/50 focus:border-downy focus:ring-downy/20 ${
+                          selectedCountryCode ? "pl-24" : ""
+                        }`}
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-charcoal">
+                    Country
+                  </FormLabel>
+                  <FormControl>
+                    <div className="[&_select]:h-12 [&_select]:rounded-2xl [&_select]:border [&_select]:border-[#efe6da] [&_select]:bg-white/90 [&_select]:px-4 [&_select]:text-charcoal [&_select]:focus:border-downy [&_select]:focus:ring-downy/20 [&_select]:focus:outline-none [&_label]:text-sm [&_label]:font-medium [&_label]:text-charcoal [&_.appearance-none]:h-12 [&_.appearance-none]:rounded-2xl [&_.appearance-none]:border [&_.appearance-none]:border-[#efe6da] [&_.appearance-none]:bg-white/90 [&_.appearance-none]:px-4 [&_.appearance-none]:text-charcoal [&_.appearance-none]:focus:border-downy [&_.appearance-none]:focus:ring-downy/20">
+                      <GlobalDropdown
+                        options={countryOptions}
+                        name="country"
+                        value={field.value}
+                        onChange={(value) => {
+                          field.onChange(value);
+                          form.setValue("city", ""); // Reset city when country changes
+                        }}
+                        placeholder="Select country"
+                        required
+                        searchable
+                        isLoading={loadingCountries}
+                        className="w-full"
+                        error={form.formState.errors.country?.message}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium text-charcoal">
+                    City
+                  </FormLabel>
+                  <FormControl>
+                    <div className="[&_select]:h-12 [&_select]:rounded-2xl [&_select]:border [&_select]:border-[#efe6da] [&_select]:bg-white/90 [&_select]:px-4 [&_select]:text-charcoal [&_select]:focus:border-downy [&_select]:focus:ring-downy/20 [&_select]:focus:outline-none [&_label]:text-sm [&_label]:font-medium [&_label]:text-charcoal [&_.appearance-none]:h-12 [&_.appearance-none]:rounded-2xl [&_.appearance-none]:border [&_.appearance-none]:border-[#efe6da] [&_.appearance-none]:bg-white/90 [&_.appearance-none]:px-4 [&_.appearance-none]:text-charcoal [&_.appearance-none]:focus:border-downy [&_.appearance-none]:focus:ring-downy/20">
+                      <GlobalDropdown
+                        options={cityOptions}
+                        name="city"
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder={
+                          !selectedCountry
+                            ? "Select country first"
+                            : loadingCities
+                            ? "Loading cities..."
+                            : "Select city"
+                        }
+                        required
+                        disabled={!selectedCountry}
+                        searchable
+                        isLoading={loadingCities}
+                        className="w-full"
+                        error={form.formState.errors.city?.message}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -218,44 +416,6 @@ const SignUp = () => {
             />
             <FormField
               control={form.control}
-              name="city"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-charcoal">
-                    City
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="City"
-                      className="h-12 rounded-2xl border border-[#efe6da] bg-white/90 px-4 text-charcoal placeholder:text-charcoal/50 focus:border-downy focus:ring-downy/20"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-charcoal">
-                    Country
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Country"
-                      className="h-12 rounded-2xl border border-[#efe6da] bg-white/90 px-4 text-charcoal placeholder:text-charcoal/50 focus:border-downy focus:ring-downy/20"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="gender"
               render={({ field }) => (
                 <FormItem>
@@ -263,30 +423,16 @@ const SignUp = () => {
                     Gender
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Female / Male / ..."
-                      className="h-12 rounded-2xl border border-[#efe6da] bg-white/90 px-4 text-charcoal placeholder:text-charcoal/50 focus:border-downy focus:ring-downy/20"
+                    <select
                       {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="nationality"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-charcoal">
-                    Nationality
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Nationality"
-                      className="h-12 rounded-2xl border border-[#efe6da] bg-white/90 px-4 text-charcoal placeholder:text-charcoal/50 focus:border-downy focus:ring-downy/20"
-                      {...field}
-                    />
+                      className="h-12 w-full rounded-2xl border border-[#efe6da] bg-white/90 px-4 text-charcoal focus:border-downy focus:ring-downy/20 focus:outline-none"
+                    >
+                      <option value="unspecified">Select gender</option>
+                      <option value="female">Female</option>
+                      <option value="male">Male</option>
+                      <option value="non_binary">Non-binary</option>
+                      <option value="unspecified">Prefer not to say</option>
+                    </select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
