@@ -54,6 +54,8 @@ const SignUp = () => {
   const [cityOptions, setCityOptions] = useState<CityOption[]>([]);
   const [loadingCountries, setLoadingCountries] = useState(true);
   const [loadingCities, setLoadingCities] = useState(false);
+  const [locationDetected, setLocationDetected] = useState(false);
+  const [detectedCityName, setDetectedCityName] = useState<string>("");
 
   const form = useForm<SignUpValues>({
     resolver: zodResolver(SignUpSchema),
@@ -71,6 +73,82 @@ const SignUp = () => {
   });
 
   const selectedCountry = form.watch("country");
+
+  // Get user location and auto-select country/city
+  useEffect(() => {
+    if (countryOptions.length === 0 || locationDetected || selectedCountry) {
+      return; // Don't auto-detect if already selected or countries not loaded
+    }
+
+    const detectLocation = async () => {
+      if (!navigator.geolocation) {
+        console.log("Geolocation is not supported by this browser.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+
+          try {
+            // Use OpenStreetMap Nominatim for reverse geocoding (free, no API key needed)
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+              {
+                headers: {
+                  "User-Agent": "PageChat/1.0", // Required by Nominatim
+                },
+              }
+            );
+
+            const data = await response.json();
+            const address = data.address;
+
+            if (address) {
+              // Get country code (ISO 3166-1 alpha-2)
+              const countryCode = address.country_code?.toUpperCase();
+              const cityName =
+                address.city ||
+                address.town ||
+                address.village ||
+                address.municipality;
+
+              if (countryCode) {
+                // Find matching country in our options
+                const matchedCountry = countryOptions.find(
+                  (opt) => opt.value === countryCode
+                );
+
+                if (matchedCountry) {
+                  // Auto-select country
+                  form.setValue("country", countryCode);
+                  setLocationDetected(true);
+
+                  // Store city name for later matching (will be used when cities load)
+                  if (cityName) {
+                    setDetectedCityName(cityName);
+                  }
+                }
+              }
+            }
+          } catch (error) {
+            console.error("Failed to reverse geocode location:", error);
+          }
+        },
+        (error) => {
+          console.log("Geolocation error:", error.message);
+          // Silently fail - user can manually select
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        }
+      );
+    };
+
+    detectLocation();
+  }, [countryOptions, locationDetected, selectedCountry, form]);
 
   // Fetch countries on mount
   useEffect(() => {
@@ -135,6 +213,24 @@ const SignUp = () => {
             value: item.id,
           })) || [];
         setCityOptions(options);
+
+        // Try to auto-select city if we detected one and cities are now loaded
+        if (detectedCityName && options.length > 0) {
+          const matchedCity = options.find((city) => {
+            const detectedNameLower = detectedCityName.toLowerCase();
+            const cityTextLower = city.text.toLowerCase();
+            return (
+              cityTextLower === detectedNameLower ||
+              cityTextLower.includes(detectedNameLower) ||
+              detectedNameLower.includes(cityTextLower.split(",")[0].trim())
+            );
+          });
+
+          if (matchedCity) {
+            form.setValue("city", matchedCity.value);
+            setDetectedCityName(""); // Clear after matching
+          }
+        }
       } catch (error) {
         console.error("Failed to fetch cities:", error);
         toast({
@@ -148,7 +244,7 @@ const SignUp = () => {
     };
 
     fetchCities();
-  }, [selectedCountry, form]);
+  }, [selectedCountry, form, detectedCityName]);
 
   // Fetch country phone code when country changes
   useEffect(() => {
