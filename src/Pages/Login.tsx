@@ -6,14 +6,17 @@ import { useAppSelector } from "@/redux/hooks";
 import LoginForm from "./Login/components/loginForm";
 
 const LoginPage = () => {
-  const { user } = useAppSelector((state) => state.auth);
+  const { user, token } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
-      navigate("/dashboard");
+    // If user is already logged in, redirect to dashboard
+    // Only check on mount, not on every user change
+    if (user && token) {
+      navigate("/dashboard", { replace: true });
     }
-  }, [user, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency - only run on mount
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fefaf5] via-white to-[#f3f0ff] flex items-center justify-center px-4 py-10">

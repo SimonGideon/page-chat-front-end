@@ -1,4 +1,5 @@
+import Breadcrumb from "./Breadcrumb";
 import Loader from "./loader";
 import NavBar from "./navBar";
 
-export { Loader, NavBar };
+export { Breadcrumb, Loader, NavBar };

@@ -54,7 +54,7 @@ const LoginForm = () => {
           description:
             response.status?.message ?? "You have successfully logged in.",
         });
-        navigate("/dashboard");
+        navigate("/dashboard", { replace: true });
       })
       .catch((error) => {
         const description =
