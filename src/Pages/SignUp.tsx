@@ -82,7 +82,6 @@ const SignUp = () => {
 
     const detectLocation = async () => {
       if (!navigator.geolocation) {
-        console.log("Geolocation is not supported by this browser.");
         return;
       }
 
@@ -131,12 +130,11 @@ const SignUp = () => {
                 }
               }
             }
-          } catch (error) {
-            console.error("Failed to reverse geocode location:", error);
+          } catch {
+            // Silently fail - user can manually select
           }
         },
-        (error) => {
-          console.log("Geolocation error:", error.message);
+        () => {
           // Silently fail - user can manually select
         },
         {
@@ -292,10 +290,36 @@ const SignUp = () => {
       });
       navigate("/signin");
     } catch (error: unknown) {
+      // Extract error message from backend response
+      let errorMessage =
+        "We couldn't complete your registration. Please review your details and try again.";
+
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response?: {
+            data?: {
+              status?: {
+                message?: string;
+              };
+              message?: string;
+              error?: string;
+            };
+          };
+        };
+
+        // Try to get the message from status.message (backend format)
+        errorMessage =
+          axiosError.response?.data?.status?.message ||
+          axiosError.response?.data?.message ||
+          axiosError.response?.data?.error ||
+          errorMessage;
+      } else if (error && typeof error === "object" && "message" in error) {
+        errorMessage = (error as { message: string }).message;
+      }
+
       toast({
         title: "Unable to create account",
-        description:
-          "We couldn't complete your registration. Please review your details and try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }

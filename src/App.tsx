@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  ActivateAccount,
   ForgotPassword,
   Home,
   Login,
@@ -38,6 +39,10 @@ const App = () => {
       element: <ResetPassword />,
     },
     {
+      path: "/activate-account",
+      element: <ActivateAccount />,
+    },
+    {
       path: "/profile",
       element: <Profile />,
       children: [
@@ -56,7 +61,7 @@ const App = () => {
       ],
     },
     {
-      path: "/page-chat",
+      path: "/dashboard",
       element: (
         <ProtectedRoute>
           <PageChat />

@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight } from "react-feather";
 import { useLocation } from "react-router-dom";
 
 import Announcements from "./announcement";
+import EditProfile from "./editProfile";
 import Engagements from "./engagements";
 import Favorite from "./favorite";
 import Reviews from "./reviews";
@@ -11,6 +12,7 @@ import { fetchFavoriteBooks } from "@/redux/features/favoriteSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 
 const tabs = [
+  "Profile",
   "Favorite",
   "Notifications",
   "Reviews",
@@ -23,7 +25,7 @@ type Tab = (typeof tabs)[number];
 const ProfileActivities = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<Tab>("Favorite");
+  const [activeTab, setActiveTab] = useState<Tab>("Profile");
   const { user } = useAppSelector((state) => state.auth);
   const { favBooks } = useAppSelector((state) => state.favBooks);
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -44,8 +46,10 @@ const ProfileActivities = () => {
       setActiveTab("Reviews");
     } else if (path === "engagements") {
       setActiveTab("Engagements");
-    } else {
+    } else if (path === "favorites") {
       setActiveTab("Favorite");
+    } else {
+      setActiveTab("Profile");
     }
   }, [location.pathname]);
 
@@ -62,16 +66,18 @@ const ProfileActivities = () => {
   };
 
   const getTabClassNames = (tab: Tab) => `
-    flex-shrink-0 cursor-pointer px-2
+    flex-shrink-0 cursor-pointer px-2 sm:px-3 py-1 text-xs sm:text-sm
     ${
       activeTab === tab
         ? "text-primaryAccent font-semibold border-b-2 border-primaryAccent"
-        : "text-charcoal/60"
+        : "text-charcoal/60 hover:text-charcoal/80"
     }
   `;
 
   const renderContent = () => {
     switch (activeTab) {
+      case "Profile":
+        return <EditProfile />;
       case "Favorite":
         return <Favorite favoriteBooks={favBooks} />;
       case "Notifications":
@@ -83,15 +89,15 @@ const ProfileActivities = () => {
       case "Settings":
         return <Settings />;
       default:
-        return <Favorite favoriteBooks={favBooks} />;
+        return <EditProfile />;
     }
   };
 
   return (
-    <div className="profile-activity w-full rounded-2xl border border-[#e4d5bb] bg-[#fef9f0] shadow-sm">
-      <div className="mb-4 flex items-center justify-between rounded-t-[14px] bg-[#ffeeda] px-4 py-3">
-        <div className="w-full overflow-x-auto" ref={scrollRef}>
-          <ul className="flex gap-2 whitespace-nowrap md:gap-5">
+    <div className="profile-activity w-full rounded-xl sm:rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="flex items-center justify-between rounded-t-xl sm:rounded-t-[14px] bg-gray-50 px-2 sm:px-4 py-2 sm:py-3">
+        <div className="flex-1 overflow-x-auto scrollbar-hide" ref={scrollRef}>
+          <ul className="flex gap-1 sm:gap-2 whitespace-nowrap md:gap-4">
             {tabs.map((tab) => (
               <li
                 key={tab}
@@ -103,24 +109,24 @@ const ProfileActivities = () => {
             ))}
           </ul>
         </div>
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-1 sm:gap-2 lg:flex ml-2">
           <button
-            className="rounded-full bg-downy p-1 text-white shadow-sm"
+            className="rounded-full bg-downy p-1 text-white shadow-sm hover:bg-downy-dark transition"
             onClick={scrollLeft}
             type="button"
           >
-            <ChevronLeft />
+            <ChevronLeft size={18} />
           </button>
           <button
-            className="rounded-full bg-downy p-1 text-white shadow-sm"
+            className="rounded-full bg-downy p-1 text-white shadow-sm hover:bg-downy-dark transition"
             onClick={scrollRight}
             type="button"
           >
-            <ChevronRight />
+            <ChevronRight size={18} />
           </button>
         </div>
       </div>
-      <div className="p-6">{renderContent()}</div>
+      <div className="p-3 sm:p-4 md:p-6">{renderContent()}</div>
     </div>
   );
 };

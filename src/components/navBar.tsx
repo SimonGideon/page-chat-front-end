@@ -14,8 +14,12 @@ const NavBar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(getCurrentUser());
-  }, [dispatch]);
+    // Only fetch current user if we have a token but no user
+    const token = localStorage.getItem("token");
+    if (token && !user) {
+      dispatch(getCurrentUser());
+    }
+  }, [dispatch, user]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -51,7 +55,7 @@ const NavBar = () => {
   };
 
   return (
-    <header className="flex h-16 items-center justify-between whitespace-nowrap border-b border-[#e5d8bf] bg-[#faf3e1e6] px-6 backdrop-blur-md">
+    <header className="sticky top-0 z-50 flex h-16 items-center justify-between whitespace-nowrap border-b border-[#e5d8bf] bg-[#faf3e1e6] px-6 backdrop-blur-md">
       <div className="flex items-center gap-4 text-charcoal">
         <a href="/" className="flex items-center gap-2">
           <div className="size-6 text-primaryAccent">
@@ -68,7 +72,7 @@ const NavBar = () => {
             <Bell className="text-charcoal/70 transition-colors hover:text-primaryAccent" />
           </a>
           {user ? (
-            <div className="relative">
+            <div className="relative z-[100]">
               <div className="flex gap-1 justify-end items-baseline">
                 <button
                   type="button"
@@ -97,21 +101,21 @@ const NavBar = () => {
                 {isPopupVisible && (
                   <div
                     ref={popupRef}
-                    className="absolute right-0 mt-8 w-52 rounded-xl border border-[#efdcc2] bg-[#fef8ef] p-1 shadow-lg z-10"
+                    className="absolute right-0 mt-8 w-52 rounded-xl border border-gray-200 bg-white p-1 shadow-lg z-[100]"
                   >
-                    <ul className="divide-y divide-[#efdcc2]">
-                      <li className="px-4 py-3 text-sm font-medium text-charcoal hover:bg-downy hover:text-white rounded-t-lg transition">
+                    <ul className="divide-y divide-gray-100">
+                      <li className="px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-t-lg transition">
                         <a className="flex" href="/profile">
                           Profile
                         </a>
                       </li>
-                      <li className="px-4 py-3 text-sm font-medium text-charcoal hover:bg-downy hover:text-white transition">
+                      <li className="px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
                         <a className="flex" href="/profile/settings">
                           Settings
                         </a>
                       </li>
                       <li
-                        className="px-4 py-3 flex items-center gap-2 text-primaryAccent hover:bg-downy-dark hover:text-white rounded-b-lg transition cursor-pointer"
+                        className="px-4 py-3 flex items-center gap-2 text-red-500 hover:bg-gray-50 rounded-b-lg transition cursor-pointer"
                         onClick={handleLogout}
                       >
                         <LogOut className="text-sm" />

@@ -57,12 +57,16 @@ export const login = createAsyncThunk<
       user: userData,
     });
 
-    const headers = response.headers as Record<string, string | undefined>;
-    const authorizationHeader =
-      headers.authorization ?? headers.Authorization ?? null;
-    const token = authorizationHeader
-      ? authorizationHeader.split(" ")[1] ?? null
-      : null;
+    // Extract token from Authorization header (axios stores headers in lowercase)
+    let token: string | null = null;
+    const authHeader = response.headers["authorization"] as string | undefined;
+
+    if (authHeader) {
+      // Remove "Bearer " prefix if present
+      token = authHeader.startsWith("Bearer ")
+        ? authHeader.substring(7)
+        : authHeader;
+    }
 
     if (token) {
       localStorage.setItem("token", token);
@@ -83,19 +87,19 @@ export const login = createAsyncThunk<
 export const getCurrentUser = createAsyncThunk<
   AuthApiResponse,
   void,
-  { rejectValue: ApiError }
+  { rejectValue: ApiError & { statusCode?: number } }
 >("auth/getCurrentUser", async (_, thunkAPI) => {
   try {
-    const response = await axiosInstance.get<AuthApiResponse>("/current_user", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    // Token is automatically added by axios interceptor
+    const response = await axiosInstance.get<AuthApiResponse>("/current_user");
     return response.data;
   } catch (error) {
-    const apiError =
-      (error as AxiosError<ApiError>).response?.data ??
-      ({ message: "Unable to fetch user" } as ApiError);
+    const axiosError = error as AxiosError<ApiError>;
+    const statusCode = axiosError.response?.status;
+    const apiError = {
+      ...(axiosError.response?.data ?? { message: "Unable to fetch user" }),
+      statusCode,
+    };
     return thunkAPI.rejectWithValue(apiError);
   }
 });
@@ -144,6 +148,12 @@ const authSlice = createSlice({
       .addCase(getCurrentUser.rejected, (state, action) => {
         state.loading = false;
         state.error = extractErrorMessage(action.payload, action.error.message);
+        // Only clear token if it's an authentication error (401)
+        if (action.payload?.statusCode === 401) {
+          state.token = null;
+          state.user = null;
+          localStorage.removeItem("token");
+        }
       });
   },
 });

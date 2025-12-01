@@ -8,7 +8,7 @@ const Favorite = ({ favoriteBooks = [] }: FavoriteProps) => {
   const hasFavorites = favoriteBooks.length > 0;
 
   return (
-    <div className="rounded-2xl border border-[#e4d5bb] bg-[#fff9ef] p-6 shadow-sm">
+    <div className="rounded-2xl border border-gray-200 bg-gray-50 p-6 shadow-sm">
       <h1 className="mb-4 text-2xl font-semibold text-charcoal">
         Favorite Books
       </h1>

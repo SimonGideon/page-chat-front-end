@@ -48,8 +48,13 @@ export interface User {
   last_name: string;
   email: string;
   phone?: string;
+  address?: string;
   residence?: string;
   city?: string;
+  city_id?: string;
+  country?: string;
+  country_code?: string;
+  gender?: string;
   home_church?: string;
   date_of_birth?: string;
   avatar_url?: string;

@@ -63,10 +63,10 @@ const GlobalDropdown: React.FC<GlobalDropdownProps> = ({
 
   // Find the selected option object (match by value first, then by text as fallback, case-insensitive)
   const selectedOptionObj =
-    options.find((opt: DropdownOption) => opt.value === selectedOption) ||
+    options.find((opt: DropdownOption) => opt?.value === selectedOption) ||
     options.find(
       (opt: DropdownOption) =>
-        opt.text.toLowerCase() === selectedOption.toLowerCase()
+        opt?.text?.toLowerCase() === selectedOption?.toLowerCase()
     );
 
   // Filter options based on search term
@@ -74,7 +74,7 @@ const GlobalDropdown: React.FC<GlobalDropdownProps> = ({
     searchTerm.trim() === ""
       ? options
       : options.filter((option: DropdownOption) =>
-          option.text.toLowerCase().includes(searchTerm.toLowerCase())
+          option?.text?.toLowerCase()?.includes(searchTerm.toLowerCase())
         );
 
   // Update local state when value prop changes
@@ -82,9 +82,9 @@ const GlobalDropdown: React.FC<GlobalDropdownProps> = ({
     const incoming = typeof value === "string" ? value : "";
 
     // Find option by value first, then by text (case-insensitive)
-    const optionByValue = options.find((opt) => opt.value === incoming);
+    const optionByValue = options.find((opt) => opt?.value === incoming);
     const optionByText = options.find(
-      (opt) => opt.text.toLowerCase() === incoming.toLowerCase()
+      (opt) => opt?.text?.toLowerCase() === incoming?.toLowerCase()
     );
 
     // Use the option's value (normalized) if found by either value or text
@@ -101,7 +101,8 @@ const GlobalDropdown: React.FC<GlobalDropdownProps> = ({
         // For multi-select, match by both value and text (case-insensitive)
         const matchedOptions = options.filter((opt: DropdownOption) =>
           (value as string[]).some(
-            (v) => v === opt.value || v.toLowerCase() === opt.text.toLowerCase()
+            (v) =>
+              v === opt?.value || v?.toLowerCase() === opt?.text?.toLowerCase()
           )
         );
         setSelectedOptions(matchedOptions);
@@ -203,7 +204,7 @@ const GlobalDropdown: React.FC<GlobalDropdownProps> = ({
           <select
             id={name}
             name={name}
-            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-[8px] focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             value={
               multiple ? selectedOptions.map((o) => o.value) : selectedOption
             }
@@ -269,7 +270,7 @@ const GlobalDropdown: React.FC<GlobalDropdownProps> = ({
             w-full px-3 py-2 border ${
               error ? "border-red-500" : "border-gray-300"
             } 
-            rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 
+            rounded-[8px] focus:outline-none focus:ring-blue-500 focus:border-blue-500 
             sm:text-sm ${disabled ? "bg-gray-100 cursor-not-allowed" : ""}
           `}
         >
@@ -319,7 +320,7 @@ const GlobalDropdown: React.FC<GlobalDropdownProps> = ({
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onClick={(e) => e.stopPropagation()}
                   placeholder="Search..."
-                  className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-[8px] focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   autoFocus
                 />
                 {searchTerm && (
