@@ -94,7 +94,7 @@ const Settings = () => {
         </p>
       </div>
 
-      <div className="max-w-md">
+      <div className="w-full">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
