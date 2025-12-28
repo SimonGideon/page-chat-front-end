@@ -9,4 +9,10 @@ export const apiClient = {
     const response = await axiosInstance.get<T>(url);
     return response.data;
   },
+  getLanguages: async () => {
+    const response = await axiosInstance.get<{
+      data: { text: string; value: string }[];
+    }>("/dropdown/get-drop-down-list?page=languages");
+    return response.data;
+  },
 };

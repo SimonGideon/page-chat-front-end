@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { NavBar } from "@/components";
 import { BooksList, HeroSection, Recommendations } from "./components";
@@ -67,20 +67,43 @@ const EmptyBooksState = ({ onRetry }: { onRetry: () => void }) => (
   </div>
 );
 
+import { apiClient } from "@/services/api";
+import GlobalDropdown, {
+  DropdownOption,
+} from "@/components/ui/GlobalDropdown";
+
 const Home = () => {
   const dispatch = useAppDispatch();
   const { books, loading, error } = useAppSelector((state) => state.featured);
+  const [languages, setLanguages] = useState<DropdownOption[]>([]);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("");
 
   useEffect(() => {
-    dispatch(fetchFeaturedBooks());
-  }, [dispatch]);
+    const fetchLanguages = async () => {
+      try {
+        const response = await apiClient.getLanguages();
+        setLanguages(response.data);
+      } catch (error) {
+        console.error("Failed to fetch languages", error);
+      }
+    };
+    fetchLanguages();
+  }, []);
+
+  useEffect(() => {
+    dispatch(
+      fetchFeaturedBooks(selectedLanguage ? { language: selectedLanguage } : undefined)
+    );
+  }, [dispatch, selectedLanguage]);
 
   const handleTitleLength = (bookTitle: string) => {
     return bookTitle.length > 20 ? `${bookTitle.slice(0, 20)}...` : bookTitle;
   };
 
   const handleRetry = () => {
-    dispatch(fetchFeaturedBooks());
+    dispatch(
+      fetchFeaturedBooks(selectedLanguage ? { language: selectedLanguage } : undefined)
+    );
   };
 
   if (loading) {
@@ -97,6 +120,18 @@ const Home = () => {
       <div className="container space-y-6 pt-6">
         <div className="layout-container flex h-full flex-col gap-6">
           <HeroSection />
+          <div className="flex justify-end">
+            <div className="w-64">
+              <GlobalDropdown
+                options={languages}
+                name="language"
+                placeholder="Filter by Language"
+                onChange={(value) => setSelectedLanguage(value as string)}
+                value={selectedLanguage}
+                searchable
+              />
+            </div>
+          </div>
           <div className="z-0 flex flex-col-reverse gap-6 md:flex-row">
             {books.length ? (
               <BooksList books={books} onTitleLength={handleTitleLength} />

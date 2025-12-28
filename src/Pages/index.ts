@@ -6,6 +6,7 @@ import ForgotPassword from "./ForgotPassword";
 import ResetPassword from "./ResetPassword";
 import SignUp from "./SignUp";
 import ActivateAccount from "./ActivateAccount";
+import ReadBook from "./ReadBook/ReadBook";
 
 export {
   Home,
@@ -16,4 +17,5 @@ export {
   ResetPassword,
   SignUp,
   ActivateAccount,
+  ReadBook,
 };
