@@ -19,7 +19,9 @@ export interface Book {
   cover_image_url: string;
   pdf_url?: string;
   publisher?: string;
-  published_at?: string;
+  published_date: string;
+  is_favorited?: boolean;
+  favorite_id?: number | null;
   rating?: number;
   pages?: number;
   author: Author;
@@ -59,4 +61,25 @@ export interface User {
   date_of_birth?: string;
   avatar_url?: string;
   token?: string;
+}
+
+export interface Comment {
+  id: Identifier;
+  body: string;
+  user: User;
+  created_at: string;
+  parent_id?: Identifier;
+  replies?: Comment[];
+}
+
+export interface Discussion {
+  id: Identifier;
+  title: string;
+  body: string;
+  user: User;
+  comments: Comment[];
+  comments_count?: number;
+  recent_commenters?: { id: Identifier; first_name: string; avatar_url?: string }[];
+  created_at: string;
+  book?: Book;
 }

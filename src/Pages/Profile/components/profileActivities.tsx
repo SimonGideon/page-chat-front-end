@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "react-feather";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import Announcements from "./announcement";
 import EditProfile from "./editProfile";
-import Engagements from "./engagements";
+import EngagementList from "./engaugementList"; // Corrected import
 import Favorite from "./favorite";
 import Reviews from "./reviews";
 import Settings from "./settings";
@@ -25,6 +25,7 @@ type Tab = (typeof tabs)[number];
 const ProfileActivities = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("Profile");
   const { user } = useAppSelector((state) => state.auth);
   const { favBooks } = useAppSelector((state) => state.favBooks);
@@ -63,6 +64,26 @@ const ProfileActivities = () => {
 
   const handleTabClick = (tab: Tab) => {
     setActiveTab(tab);
+    switch (tab) {
+      case "Profile":
+        navigate("/profile");
+        break;
+      case "Favorite":
+        navigate("/profile/favorites");
+        break;
+      case "Notifications":
+        navigate("/profile/notifications");
+        break;
+      case "Reviews":
+        navigate("/profile/reviews");
+        break;
+      case "Engagements":
+        navigate("/profile/engagements");
+        break;
+      case "Settings":
+        navigate("/profile/settings");
+        break;
+    }
   };
 
   const getTabClassNames = (tab: Tab) => `
@@ -85,7 +106,7 @@ const ProfileActivities = () => {
       case "Reviews":
         return <Reviews />;
       case "Engagements":
-        return <Engagements />;
+        return <EngagementList />;
       case "Settings":
         return <Settings />;
       default:

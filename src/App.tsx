@@ -56,8 +56,20 @@ const App = () => {
           element: <Settings />,
         },
         {
-          index: true,
+          path: "favorites",
           element: <Favorite />,
+        },
+        {
+          path: "reviews",
+          element: <Favorite />, // Using placeholder or wrapper if Reviews component needs props
+        },
+        {
+          path: "engagements",
+          element: <Favorite />, // Placeholder
+        },
+        {
+          index: true,
+          element: <Favorite />, 
         },
       ],
     },

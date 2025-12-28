@@ -23,6 +23,8 @@ const PageChat = () => {
   const { books: recommendedBooks, loading: booksLoading } = useAppSelector(
     (state) => state.recommended
   );
+  const [favoriteBooks, setFavoriteBooks] = useState<any[]>([]);
+  const [loadingFavorites, setLoadingFavorites] = useState(false);
   const [isBirthday, setIsBirthday] = useState(false);
   const [greeting, setGreeting] = useState("Hello");
 
@@ -46,7 +48,14 @@ const PageChat = () => {
 
   useEffect(() => {
     if (user?.id) {
-      dispatch(fetchFavoriteBooks(user.id));
+      // Fetch favorites locally to ensure correct structure
+      setLoadingFavorites(true);
+      import("@/services/api").then(({ apiClient }) => {
+          apiClient.getFavorites()
+            .then(res => setFavoriteBooks(res.data || []))
+            .catch(err => console.error("Failed to fetch favorites", err))
+            .finally(() => setLoadingFavorites(false));
+      });
     }
     dispatch(fetchRecommendedBooks());
   }, [dispatch, user?.id]);
@@ -63,7 +72,7 @@ const PageChat = () => {
   const stats = [
     {
       label: "Favorites",
-      value: favBooks?.length || 0,
+      value: favoriteBooks.length || favBooks?.length || 0,
       icon: Heart,
       color: "bg-gradient-to-br from-rose-400 to-rose-500",
       href: "/profile",
@@ -227,7 +236,7 @@ const PageChat = () => {
         </section>
 
         {/* Favorites Preview */}
-        {favBooks && favBooks.length > 0 && (
+        {favoriteBooks.length > 0 && (
           <section className="mt-10">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-charcoal">
@@ -241,30 +250,16 @@ const PageChat = () => {
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {favBooks.slice(0, 6).map(
-                (entry) =>
-                  entry.book && (
-                    <div
-                      key={entry.id}
-                      className="group bg-white rounded-2xl p-3 shadow-sm border border-cream hover:shadow-lg hover:border-rose-200 transition-all duration-300 cursor-pointer"
-                    >
-                      <div className="aspect-[3/4] rounded-xl overflow-hidden mb-3 bg-cream relative">
-                        <img
-                          src={entry.book.cover_image_url}
-                          alt={entry.book.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm p-1.5 rounded-full">
-                          <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
-                        </div>
-                      </div>
-                      <h3 className="font-medium text-charcoal text-sm line-clamp-2 group-hover:text-downy transition-colors">
-                        {entry.book.title}
-                      </h3>
-                    </div>
-                  )
-              )}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {favoriteBooks.slice(0, 5).map((book) => (
+                <BookCard
+                  key={book.id}
+                  book={book}
+                  onClick={() =>
+                    navigate(`/read/${book.id}`, { state: { book } })
+                  }
+                />
+              ))}
             </div>
           </section>
         )}
