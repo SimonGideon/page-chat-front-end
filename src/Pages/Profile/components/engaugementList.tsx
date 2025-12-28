@@ -1,67 +1,47 @@
+import { useEffect, useState } from "react";
+import { apiClient } from "@/services/api";
+import { Loader } from "@/components";
+import type { Discussion } from "@/types";
 import Engagements from "./engagements";
 
-type Deal = {
-  initials: string;
-  title: string;
-  subtitle: string;
-  amount: string;
-  timeAgo: string;
-  image: string;
-  status: string;
-};
-
-const deals: Deal[] = [
-  {
-    initials: "BJ",
-    title: "Deal title would go here...",
-    subtitle: "Deal for the property in Malibu with Casey Brother Real Estate",
-    amount: "$2,232,342.32",
-    timeAgo: "4 months ago",
-    image: "https://via.placeholder.com/32",
-    status: "Lost Deal",
-  },
-  {
-    initials: "RO",
-    title: "Deal title would go here...",
-    subtitle: "Deal for the property in Malibu with Casey Brother Real Estate",
-    amount: "$2,232,342.32",
-    timeAgo: "4 months ago",
-    image: "https://via.placeholder.com/32",
-    status: "Won Deal",
-  },
-  {
-    initials: "RJ",
-    title: "Deal title would go here...",
-    subtitle: "Deal for the property in Malibu with Casey Brother Real Estate",
-    amount: "$2,232,342.32",
-    timeAgo: "4 months ago",
-    image: "https://via.placeholder.com/32",
-    status: "Lost Deal",
-  },
-  {
-    initials: "DJ",
-    title: "Deal title would go here...",
-    subtitle: "Deal for the property in Malibu with Casey Brother Real Estate",
-    amount: "$2,232,342.32",
-    timeAgo: "4 months ago",
-    image: "https://via.placeholder.com/32",
-    status: "Won Deal",
-  },
-];
-
 const EngagementList = () => {
+  const [engagements, setEngagements] = useState<Discussion[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEngagements = async () => {
+      try {
+        const response = await apiClient.getEngagements();
+        if (response?.data) {
+          setEngagements(response.data);
+        }
+      } catch (error) {
+        console.error("Failed to load engagements", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEngagements();
+  }, []);
+
+  if (loading) {
+    return <div className="p-4 flex justify-center"><Loader /></div>;
+  }
+
+  if (engagements.length === 0) {
+    return (
+      <div className="text-center py-10 text-charcoal/60 bg-gray-50 rounded-xl border border-gray-100">
+        <p>You haven't participated in any discussions yet.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      {deals.map((deal) => (
+    <div className="space-y-4 animate-in fade-in duration-500">
+      {engagements.map((discussion) => (
         <Engagements
-          key={`${deal.initials}-${deal.timeAgo}`}
-          initials={deal.initials}
-          title={deal.title}
-          subtitle={deal.subtitle}
-          amount={deal.amount}
-          timeAgo={deal.timeAgo}
-          image={deal.image}
-          status={deal.status}
+          key={discussion.id}
+          discussion={discussion}
         />
       ))}
     </div>

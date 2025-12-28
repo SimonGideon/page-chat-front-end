@@ -1,9 +1,11 @@
 import { useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Document, Page, pdfjs } from "react-pdf";
-import { ChevronLeft, ChevronRight, BookOpen, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, BookOpen, Clock, Heart } from "lucide-react";
 import { NavBar } from "@/components";
 import type { Book } from "@/types";
+import { apiClient } from "@/services/api";
+import DiscussionPanel from "./components/DiscussionPanel"; // Import DiscussionPanel
 
 // Setup PDF worker
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
@@ -38,12 +40,57 @@ function useWindowSize() {
 const ReadBook = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const book = state?.book as Book | undefined;
+  const [book, setBook] = useState<Book | undefined>(state?.book);
   const { width } = useWindowSize();
   
+  const [containerWidth, setContainerWidth] = useState<number | null>(null);
+  const pdfContainerRef = useRef<HTMLDivElement>(null);
+
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
+  const [isInteractive, setIsInteractive] = useState(() => {
+    return localStorage.getItem("isInteractive") === "true";
+  });
   const scrollRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+     localStorage.setItem("isInteractive", String(isInteractive));
+  }, [isInteractive]);
+
+  useEffect(() => {
+    if (book?.id) {
+       apiClient.getBook(String(book.id))
+         .then(res => {
+            if (res.data) setBook(prev => ({ ...prev, ...res.data }));
+         })
+         .catch(err => console.error("Failed to refresh book data", err));
+    }
+  }, [book?.id]);
+
+  useEffect(() => {
+    if (!pdfContainerRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.contentBoxSize) {
+           // Use contentBoxSize for precise content width
+           const contentBoxSize = Array.isArray(entry.contentBoxSize)
+             ? entry.contentBoxSize[0]
+             : entry.contentBoxSize;
+           setContainerWidth(contentBoxSize.inlineSize);
+        } else {
+           // Fallback
+           setContainerWidth(entry.contentRect.width);
+        }
+      }
+    });
+
+    resizeObserver.observe(pdfContainerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [pdfContainerRef.current]);
 
   if (!book) {
     navigate("/dashboard");
@@ -64,6 +111,22 @@ const ReadBook = () => {
 
   const handleStartReading = () => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+  
+  const handleToggleFavorite = async () => {
+     if (!book) return;
+     try {
+       if (book.is_favorited && book.favorite_id) {
+          await apiClient.removeFromFavorites(book.favorite_id);
+          setBook({ ...book, is_favorited: false, favorite_id: null });
+       } else {
+          const res = await apiClient.addToFavorites(String(book.id));
+          // Assuming backend returns the favorite object with ID
+          setBook({ ...book, is_favorited: true, favorite_id: res.data.id });
+       }
+     } catch (err) {
+       console.error("Failed to toggle favorite", err);
+     }
   };
 
   return (
@@ -92,9 +155,18 @@ const ReadBook = () => {
               </button>
 
               <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-cream shadow-sm text-sm font-medium text-charcoal/70">
-                  <BookOpen className="w-4 h-4 text-downy" />
-                  <span>{book.category?.name || "Uncategorized"}</span>
+                <div className="flex items-center gap-4">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-cream shadow-sm text-sm font-medium text-charcoal/70">
+                    <BookOpen className="w-4 h-4 text-downy" />
+                    <span>{book.category?.name || "Uncategorized"}</span>
+                  </div>
+                  
+                  <button
+                     onClick={handleToggleFavorite}
+                     className={`p-2 rounded-full border transition-all ${book.is_favorited ? "bg-red-50 border-red-200 text-red-500" : "bg-white border-cream text-charcoal/40 hover:text-red-400"}`}
+                  >
+                     <Heart className={`w-5 h-5 ${book.is_favorited ? "fill-current" : ""}`} />
+                  </button>
                 </div>
                 
                 <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif font-bold text-charcoal leading-tight">
@@ -105,7 +177,7 @@ const ReadBook = () => {
                   by {book.author?.name}
                 </p>
                 
-                <p className="text-base sm:text-lg text-charcoal/80 max-w-xl leading-relaxed">
+                <p className="text-base sm:text-lg text-charcoal/80 max-w-xl leading-relaxed line-clamp-4">
                   {book.description || "No description available for this book."}
                 </p>
 
@@ -162,7 +234,7 @@ const ReadBook = () => {
       {/* Reader Section */}
       <section ref={scrollRef} className="py-12 md:py-20 bg-white min-h-screen">
         <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto">
+          <div className={`mx-auto transition-all duration-500 ${isInteractive ? 'max-w-[1600px]' : 'max-w-5xl'}`}>
             {/* Controls */}
             <div className="sticky top-20 z-10 flex items-center justify-between p-3 md:p-4 bg-white/80 backdrop-blur-md rounded-2xl shadow-sm border border-cream mb-6 md:mb-8 transition-all">
                <span className="font-medium text-sm md:text-base text-charcoal">
@@ -185,32 +257,65 @@ const ReadBook = () => {
                    <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
+
+               {/* Interaction Toggle */}
+               <div className="flex items-center gap-3 pl-4 border-l border-cream/50">
+                <span className="text-sm font-medium text-charcoal hidden sm:block">Interactive Mode</span>
+                <button
+                  onClick={() => setIsInteractive(!isInteractive)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-downy focus:ring-offset-2 ${
+                    isInteractive ? 'bg-downy' : 'bg-gray-200'
+                  }`}
+                >
+                  <span
+                    className={`${
+                      isInteractive ? 'translate-x-6' : 'translate-x-1'
+                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                  />
+                </button>
+              </div>
             </div>
 
-            {/* PDF Canvas */}
-            <div className="flex justify-center bg-cream/30 rounded-2xl md:rounded-3xl p-2 md:p-12 min-h-[50vh] md:min-h-[800px] shadow-inner overflow-hidden">
-               <Document
-                file={book.pdf_url}
-                onLoadSuccess={onDocumentLoadSuccess}
-                className="shadow-xl md:shadow-2xl rounded-sm overflow-hidden bg-white"
-                loading={
-                  <div className="h-[50vh] md:h-[800px] flex items-center justify-center text-charcoal/40">
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="w-8 h-8 border-4 border-downy border-t-transparent rounded-full animate-spin" />
-                      <p>Loading book content...</p>
-                    </div>
-                  </div>
-                }
+            <div className={`flex flex-col lg:flex-row gap-6 transition-all duration-500`}>
+              {/* PDF Canvas */}
+              <div 
+                ref={pdfContainerRef}
+                className={`flex justify-center bg-cream/30 rounded-2xl md:rounded-3xl p-2 md:p-8 min-h-[50vh] md:min-h-[800px] shadow-inner overflow-hidden transition-all duration-500 ${isInteractive ? 'lg:w-[65%]' : 'w-full'}`}
               >
-                <Page 
-                  pageNumber={pageNumber} 
-                  className="max-w-full"
-                  width={Math.min(width * 0.9, 800)} // Responsive width using hook
-                  renderTextLayer={false}
-                  renderAnnotationLayer={false}
-                  scale={width < 768 ? 1 : 1.2}
-                />
-              </Document>
+                 <Document
+                  file={book.pdf_url}
+                  onLoadSuccess={onDocumentLoadSuccess}
+                  className="shadow-xl md:shadow-2xl rounded-sm overflow-hidden bg-white"
+                  loading={
+                    <div className="h-[50vh] md:h-[800px] flex items-center justify-center text-charcoal/40">
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="w-8 h-8 border-4 border-downy border-t-transparent rounded-full animate-spin" />
+                        <p>Loading book content...</p>
+                      </div>
+                    </div>
+                  }
+                >
+                  <Page 
+                    pageNumber={pageNumber} 
+                    className="max-w-full"
+                    width={containerWidth ? Math.min(containerWidth - 40, isInteractive ? 1200 : 1000) : 600} // Dynamic width using container size
+                    renderTextLayer={false}
+                    renderAnnotationLayer={false}
+                    scale={width < 768 ? 1 : 1.2}
+                  />
+                </Document>
+              </div>
+
+               {/* Discussion Panel Side View */}
+               {isInteractive && (
+                <div className="lg:w-[35%] h-[600px] lg:h-[800px] sticky top-24 animate-in slide-in-from-right duration-500">
+                  <DiscussionPanel 
+                    bookId={book.id} 
+                    className="rounded-2xl shadow-lg border border-cream h-full"
+                    onClose={() => setIsInteractive(false)}
+                   />
+                </div>
+               )}
             </div>
           </div>
         </div>

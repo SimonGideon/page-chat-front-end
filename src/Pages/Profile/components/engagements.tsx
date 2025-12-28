@@ -1,75 +1,57 @@
+import { formatDate } from "@/lib";
+import type { Discussion } from "@/types";
+import { MessageSquare } from "lucide-react";
+
 type EngagementsProps = {
-  initials: string;
-  title: string;
-  subtitle: string;
-  amount: string;
-  timeAgo: string;
-  image: string;
-  status: string;
+  discussion: Discussion;
 };
 
-const getStatusStyles = (status: string) => {
-  if (status === "Lost Deal") {
-    return {
-      badge: "bg-red-100 text-red-500",
-      avatar: "red",
-    };
-  }
-  if (status === "Won Deal") {
-    return {
-      badge: "bg-green-100 text-green-500",
-      avatar: "green",
-    };
-  }
-  return {
-    badge: "bg-gray-100 text-gray-500",
-    avatar: "gray",
-  };
-};
-
-const Engagements = ({
-  initials,
-  title,
-  subtitle,
-  amount,
-  timeAgo,
-  image,
-  status,
-}: EngagementsProps) => {
-  const { badge, avatar } = getStatusStyles(status);
+const Engagements = ({ discussion }: EngagementsProps) => {
+  const { title, body, created_at, book, comments_count } = discussion;
+  
+  // Truncate body for preview
+  const truncatedBody = body.length > 100 ? `${body.substring(0, 100)}...` : body;
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
-      <div className="flex items-center space-x-4">
-        <div
-          className="w-24 h-12 md:w-12 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-base"
-          style={{ backgroundColor: avatar }}
-        >
-          {initials}
-        </div>
-        <div>
-          <h3 className="font-bold text-base sm:text-lg text-gray-900">
-            {title}
-          </h3>
-          <p className="text-xs sm:text-sm text-gray-600">{subtitle}</p>
-        </div>
-      </div>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-4">
-        <div className="text-xs sm:text-sm">
-          <p className="text-gray-900 font-semibold">{amount}</p>
-          <p className="text-gray-400">{timeAgo}</p>
-        </div>
-        <div className="flex items-center space-x-2 mt-2 sm:mt-0">
-          <img
-            src={image}
-            alt="Profile"
-            className="w-8 h-8 rounded-full object-cover"
+    <div className="bg-white p-4 rounded-lg shadow-sm flex flex-col sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 border border-gray-100 hover:border-downy/30 transition-colors">
+      <div className="flex-shrink-0">
+        {book?.cover_image_url ? (
+          <img 
+            src={book.cover_image_url} 
+            alt={book.title} 
+            className="w-12 h-16 object-cover rounded shadow-sm"
           />
-          <span
-            className={`px-2 py-1 rounded-full text-xs sm:text-sm font-semibold ${badge}`}
-          >
-            {status}
+        ) : (
+          <div className="w-12 h-16 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500 text-center">
+            No Cover
+          </div>
+        )}
+      </div>
+      
+      <div className="flex-grow">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="font-bold text-base sm:text-lg text-charcoal leading-tight mb-1">
+              {title}
+            </h3>
+            <p className="text-xs text-downy font-medium mb-1">
+              on {book?.title || "Unknown Book"}
+            </p>
+          </div>
+          <span className="text-xs text-gray-400 whitespace-nowrap ml-2">
+            {formatDate(created_at)}
           </span>
+        </div>
+        
+        <p className="text-sm text-charcoal/80 mb-3 break-words">
+          {truncatedBody}
+        </p>
+        
+        <div className="flex items-center text-charcoal/60 text-xs gap-3">
+          <div className="flex items-center gap-1">
+             <MessageSquare size={14} />
+             <span>{comments_count || 0} Comments</span>
+          </div>
         </div>
       </div>
     </div>
