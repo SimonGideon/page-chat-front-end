@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-import { Breadcrumb, Loader, NavBar } from "@/components";
+import { BookCard, Breadcrumb, Loader, NavBar } from "@/components";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchFavoriteBooks } from "@/redux/features/favoriteSlice";
 import { fetchRecommendedBooks } from "@/redux/features/booksSlice";
@@ -198,24 +198,13 @@ const PageChat = () => {
           ) : recommendedBooks && recommendedBooks.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {recommendedBooks.slice(0, 5).map((book) => (
-                <div
+                <BookCard
                   key={book.id}
-                  className="group bg-white rounded-2xl p-3 shadow-sm border border-cream hover:shadow-lg hover:border-downy/30 transition-all duration-300 cursor-pointer"
-                >
-                  <div className="aspect-[3/4] rounded-xl overflow-hidden mb-3 bg-cream">
-                    <img
-                      src={book.cover_image_url}
-                      alt={book.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <h3 className="font-medium text-charcoal text-sm line-clamp-2 mb-1 group-hover:text-downy transition-colors">
-                    {book.title}
-                  </h3>
-                  <p className="text-xs text-charcoal/60">
-                    {book.author?.name}
-                  </p>
-                </div>
+                  book={book}
+                  onClick={() =>
+                    navigate(`/read/${book.id}`, { state: { book } })
+                  }
+                />
               ))}
             </div>
           ) : (

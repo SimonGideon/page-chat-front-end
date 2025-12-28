@@ -8,6 +8,7 @@ import {
   Profile,
   ResetPassword,
   SignUp,
+  ReadBook,
 } from "./Pages";
 import { Favorite, Announcements, Settings } from "./Pages/Profile/components";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -65,6 +66,14 @@ const App = () => {
       element: (
         <ProtectedRoute>
           <PageChat />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/read/:id",
+      element: (
+        <ProtectedRoute>
+          <ReadBook />
         </ProtectedRoute>
       ),
     },
