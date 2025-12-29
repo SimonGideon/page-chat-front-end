@@ -6,6 +6,7 @@ import { NavBar } from "@/components";
 import type { Book } from "@/types";
 import { apiClient } from "@/services/api";
 import DiscussionPanel from "./components/DiscussionPanel"; // Import DiscussionPanel
+import { useAppSelector } from "@/redux/hooks"; // Import Redux hooks
 
 // Setup PDF worker
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
@@ -42,6 +43,7 @@ const ReadBook = () => {
   const navigate = useNavigate();
   const [book, setBook] = useState<Book | undefined>(state?.book);
   const { width } = useWindowSize();
+  const { user } = useAppSelector((state) => state.auth); // Get user from Redux
   
   const [containerWidth, setContainerWidth] = useState<number | null>(null);
   const pdfContainerRef = useRef<HTMLDivElement>(null);
@@ -302,8 +304,41 @@ const ReadBook = () => {
                     renderTextLayer={false}
                     renderAnnotationLayer={false}
                     scale={width < 768 ? 1 : 1.2}
+                    error={<div className="w-full h-[800px] bg-white flex items-center justify-center text-charcoal/10">Preview Content Placeholder</div>}
                   />
                 </Document>
+
+                 {/* Login Overlay for Limited Preview */}
+                 {/* Login Overlay for Limited Preview */}
+                 {/* Login Overlay for Limited Preview */}
+                 {!user && numPages && pageNumber === numPages && (
+                   <div className="absolute bottom-0 left-0 w-full h-[85%] z-20 flex flex-col justify-end">
+                     {/* Gradient Blur Effect */}
+                     <div className="absolute inset-0 bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-[2px]" />
+                     
+                     <div className="relative z-30 p-8 pb-20 flex flex-col items-center text-center animate-in slide-in-from-bottom-10 duration-700">
+                       <div className="w-16 h-16 bg-white shadow-lg rounded-full flex items-center justify-center mb-6 text-downy border border-downy/10">
+                         <BookOpen className="w-8 h-8" />
+                       </div>
+                       
+                       <h3 className="text-3xl font-serif font-bold text-charcoal mb-3">
+                         Keep Reading
+                       </h3>
+                       
+                       <p className="text-charcoal/60 mb-8 max-w-md font-medium leading-relaxed">
+                         You've reached the end of the free preview. <br/>
+                         Sign in to unlock the full story and interactive features.
+                       </p>
+                       
+                       <button 
+                         onClick={() => navigate("/signin")}
+                         className="px-10 py-4 bg-charcoal text-white rounded-full font-bold tracking-wide hover:bg-downy transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1"
+                       >
+                         Login to Continue
+                       </button>
+                     </div>
+                   </div>
+                 )}
               </div>
 
                {/* Discussion Panel Side View */}

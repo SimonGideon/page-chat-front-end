@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { MessageSquare, Send, X, Plus, ChevronDown, ChevronUp, Reply } from "lucide-react";
+import { MessageSquare, Send, X, Plus, ChevronDown, ChevronUp, Reply, Heart } from "lucide-react";
 import { useForm } from "react-hook-form";
 import type { Discussion, Comment, Identifier } from "@/types";
 import { apiClient } from "@/services/api";
@@ -308,38 +308,56 @@ const DiscussionDetail = ({
   const [commentText, setCommentText] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchComments = async (pageNum: number, reset = false) => {
-    if (loading) return; 
-    setLoading(true);
+  const fetchComments = useCallback(async (pageNum: number, reset = false, isBackground = false) => {
+    if (loading && !isBackground) return; 
+    if (!isBackground) setLoading(true);
     try {
       const response = await apiClient.getDiscussionComments(String(discussion.id), pageNum);
       const data = response.data as Comment[];
       const total = response.meta.total_count;
 
-      if (reset) {
-        setComments(data);
-      } else {
-        setComments((prev) => [...prev, ...data]);
-      }
+      setComments((prev) => {
+        if (reset) return data;
+        return [...prev, ...data];
+      });
       
       // Pagination logic
-      if (reset) {
-         setHasMore(data.length < total);
-      } else {
-         setHasMore(comments.length + data.length < total);
-      }
+      setHasMore((prevHasMore) => {
+          // If we are resetting, we check if data < total
+          if (reset) return data.length < total;
+          // If appending, we need the *new* length. 
+          // Since we can't easily access 'new-prev', we might rely on the closure 'comments.length' 
+          // BUT 'comments' might be stale if we don't depend on it. 
+          // Safer: Calculate based on pageNum * per_page (10) vs total? 
+          // Or just allow a minor inconsistency. 
+          // Best fix: pass a functional update or rely on updated logic.
+          // For now, let's use the simplest logic that worked before but fixed for key dependencies.
+          return (pageNum * 10) < total; 
+      });
 
     } catch (error) {
        console.error("Failed to fetch comments", error);
     } finally {
-        setLoading(false);
+        if (!isBackground) setLoading(false);
     }
-  };
+  }, [discussion.id, loading]);
 
   useEffect(() => {
     setPage(1);
     fetchComments(1, true);
-  }, [discussion.id]);
+  }, [fetchComments]);
+
+  // Heartbeat Polling
+  useEffect(() => {
+    const interval = setInterval(() => {
+        // Only refresh if we are on page 1 (MVP: simplest way to avoid pagination conflict)
+        if (page === 1 && !loading) {
+            fetchComments(1, true, true);
+        }
+    }, 10000); // 10 seconds
+
+    return () => clearInterval(interval);
+  }, [fetchComments, page, loading]);
 
   const loadMoreComments = () => {
      if (!loading && hasMore) {
@@ -492,6 +510,31 @@ const CommentItem = ({ comment, discussionId, currentUser, depth = 0 }: { commen
         if(comment.replies) setReplies(comment.replies);
     }, [comment.replies]);
 
+    const [liked, setLiked] = useState(comment.is_liked || false);
+    const [likesCount, setLikesCount] = useState(comment.likes_count || 0);
+
+    const toggleLike = async () => {
+        const originalLiked = liked;
+        const originalCount = likesCount;
+
+        // Optimistic UI update
+        setLiked(!liked);
+        setLikesCount(liked ? likesCount - 1 : likesCount + 1);
+
+        try {
+            if (liked) {
+                await apiClient.unlikeComment(comment.id);
+            } else {
+                await apiClient.likeComment(comment.id);
+            }
+        } catch (error) {
+            console.error("Failed to toggle like", error);
+            // Revert on error
+            setLiked(originalLiked);
+            setLikesCount(originalCount);
+        }
+    };
+
     const handleSendReply = async (e: React.FormEvent) => {
         e.preventDefault();
         if(!replyText.trim()) return;
@@ -508,6 +551,7 @@ const CommentItem = ({ comment, discussionId, currentUser, depth = 0 }: { commen
                  user: { // Fallback user info
                     first_name: currentUser?.first_name || 'Me',
                     last_name: currentUser?.last_name || '',
+                    avatar_url: currentUser?.avatar_url,
                     ...currentUser
                 },
                 replies: []
@@ -546,13 +590,21 @@ const CommentItem = ({ comment, discussionId, currentUser, depth = 0 }: { commen
                         {comment.body}
                     </p>
                     
-                    {/* Reply Action */}
-                    <div className="mt-2 flex items-center gap-2">
+                    {/* Reply Action & Likes */}
+                    <div className="mt-2 flex items-center gap-4">
                          <button 
                             onClick={() => setIsReplying(!isReplying)}
-                            className="text-xs text-charcoal/40 hover:text-downy flex items-center gap-1 transition-colors"
+                            className="text-xs text-charcoal/40 hover:text-downy flex items-center gap-1 transition-colors group"
                         >
-                            <Reply className="w-3 h-3" /> Reply
+                            <Reply className="w-3 h-3 group-hover:scale-110 transition-transform" /> Reply
+                         </button>
+
+                         <button 
+                            onClick={toggleLike}
+                            className={`text-xs flex items-center gap-1 transition-colors group ${liked ? 'text-red-500' : 'text-charcoal/40 hover:text-red-400'}`}
+                         >
+                            <Heart className={`w-3 h-3 transition-all ${liked ? 'fill-current scale-110' : 'group-hover:scale-110'}`} /> 
+                            {likesCount > 0 && <span>{likesCount}</span>}
                          </button>
                     </div>
                 </div>

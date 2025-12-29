@@ -63,4 +63,12 @@ export const apiClient = {
     const response = await axiosInstance.get<{ data: any[]; meta: { total_count: number } }>(`/engagements?page=${page}`);
     return response.data;
   },
+  likeComment: async (commentId: string | number) => {
+    const response = await axiosInstance.post(`/books/na/discussions/na/comments/${commentId}/like`);
+    return response.data;
+  },
+  unlikeComment: async (commentId: string | number) => {
+    const response = await axiosInstance.delete(`/books/na/discussions/na/comments/${commentId}/like`);
+    return response.data;
+  },
 };
