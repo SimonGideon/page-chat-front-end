@@ -70,6 +70,8 @@ export interface Comment {
   created_at: string;
   parent_id?: Identifier;
   replies?: Comment[];
+  likes_count?: number;
+  is_liked?: boolean;
 }
 
 export interface Discussion {

@@ -1,5 +1,9 @@
+
 import { useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
+import { BookOpen } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "@/redux/hooks";
 
 import type { Book } from "@/types";
 
@@ -16,6 +20,8 @@ type BookDetailsProps = {
 const BookDetails = ({ book, onClose }: BookDetailsProps) => {
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(2);
+  const { user } = useAppSelector((state) => state.auth); // Get user
+  const navigate = useNavigate(); // Get navigate
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
@@ -81,9 +87,43 @@ const BookDetails = ({ book, onClose }: BookDetailsProps) => {
               file={book.pdf_url}
               onLoadSuccess={onDocumentLoadSuccess}
               onLoadError={onLoadError}
-              className="w-full overflow-hidden"
+              className="w-full overflow-hidden relative"
             >
-              <Page pageNumber={pageNumber} className="pdf-page" scale={1.5} />
+              <Page 
+                pageNumber={pageNumber} 
+                className="pdf-page" 
+                scale={1.5} 
+                error={<div className="w-full h-[600px] bg-white flex items-center justify-center text-charcoal/10">Preview Content Placeholder</div>}
+              />
+              
+              {/* Login Overlay for Limited Preview */}
+              {!user && numPages && pageNumber === numPages + 1 && (
+                <div className="absolute bottom-0 left-0 w-full h-[85%] z-20 flex flex-col justify-end">
+                   {/* Gradient Blur Effect */}
+                   <div className="absolute inset-0 bg-gradient-to-t from-white via-white/95 to-transparent backdrop-blur-[1px]" />
+                   
+                   <div className="relative z-30 p-6 pb-12 flex flex-col items-center text-center animate-in slide-in-from-bottom-10 duration-700">
+                     <div className="w-12 h-12 bg-white shadow-md rounded-full flex items-center justify-center mb-4 text-downy border border-downy/10">
+                       <BookOpen className="w-6 h-6" />
+                     </div>
+                     
+                     <h3 className="text-xl font-serif font-bold text-charcoal mb-2">
+                       Keep Reading
+                     </h3>
+                     
+                     <p className="text-charcoal/60 text-sm mb-6 leading-relaxed">
+                       Sign in to unlock the full story.
+                     </p>
+                     
+                     <button 
+                       onClick={() => navigate("/signin")}
+                       className="w-full py-3 bg-charcoal text-white rounded-xl font-bold tracking-wide hover:bg-downy transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                     >
+                       Login to Continue
+                     </button>
+                   </div>
+                </div>
+              )}
             </Document>
             <div className="flex justify-center mt-2 space-x-4 text-white">
               <button
