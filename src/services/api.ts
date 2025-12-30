@@ -71,4 +71,8 @@ export const apiClient = {
     const response = await axiosInstance.delete(`/books/na/discussions/na/comments/${commentId}/like`);
     return response.data;
   },
+  updateReadingPosition: async (bookId: string | number, data: { page_number: number; scroll_offset?: number; percentage_completed?: number }) => {
+    const response = await axiosInstance.patch(`/books/${bookId}/reading_position`, data);
+    return response.data;
+  },
 };
