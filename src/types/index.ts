@@ -26,6 +26,12 @@ export interface Book {
   pages?: number;
   author: Author;
   category: Category;
+  reading_position?: {
+    page_number: number;
+    scroll_offset?: number;
+    percentage_completed?: number;
+    last_read_at: string;
+  };
 }
 
 export interface FavoriteBookEntry {

@@ -16,7 +16,7 @@ import {
   toast,
 } from "@/components/ui";
 import GlobalDropdown from "@/components/ui/GlobalDropdown";
-import { getCurrentUser } from "@/redux/features/authSlice";
+import { getCurrentUser, setUser } from "@/redux/features/authSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import axiosInstance from "@/redux/utils/axiosInstance";
 
@@ -239,14 +239,19 @@ const EditProfile = () => {
         formData.append("user[avatar]", avatarFile);
       }
 
-      await axiosInstance.patch(`/users/${user?.id}`, formData, {
+      const response = await axiosInstance.patch<{ data: any }>(`/users/${user?.id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
-      // Refresh user data to get updated avatar URL
-      dispatch(getCurrentUser());
+      // Update user data immediately with the response from the server
+      if (response.data && response.data.data) {
+          dispatch(setUser(response.data.data)); // The response is already serialized attributes
+      } else {
+          // Fallback if structure differs, though controller returns { data: attributes }
+          dispatch(getCurrentUser());
+      }
 
       toast({
         title: "Success",

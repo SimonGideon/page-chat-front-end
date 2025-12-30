@@ -50,6 +50,7 @@ const ReadBook = () => {
 
   const [numPages, setNumPages] = useState<number | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
+  const [resumePage, setResumePage] = useState<number | null>(null);
   const [isInteractive, setIsInteractive] = useState(() => {
     return localStorage.getItem("isInteractive") === "true";
   });
@@ -63,11 +64,30 @@ const ReadBook = () => {
     if (book?.id) {
        apiClient.getBook(String(book.id))
          .then(res => {
-            if (res.data) setBook(prev => ({ ...prev, ...res.data }));
+            if (res.data) {
+                setBook(prev => ({ ...prev, ...res.data }));
+                if (res.data.reading_position?.page_number && res.data.reading_position.page_number > 1) {
+                    setResumePage(res.data.reading_position.page_number);
+                }
+            }
          })
          .catch(err => console.error("Failed to refresh book data", err));
     }
   }, [book?.id]);
+
+  // Save reading position
+  useEffect(() => {
+      if (!user || !book?.id || !numPages) return;
+
+      const timeoutId = setTimeout(() => {
+          apiClient.updateReadingPosition(book.id, {
+              page_number: pageNumber,
+              percentage_completed: numPages ? (pageNumber / numPages) * 100 : 0
+          }).catch(err => console.error("Failed to save reading position", err));
+      }, 1000); // Debounce for 1 second
+
+      return () => clearTimeout(timeoutId);
+  }, [pageNumber, book?.id, user, numPages]);
 
   useEffect(() => {
     if (!pdfContainerRef.current) return;
@@ -210,11 +230,45 @@ const ReadBook = () => {
                 onClick={handleStartReading}
                 className="w-full sm:w-auto justify-center group relative inline-flex items-center gap-3 px-8 py-4 bg-charcoal text-white rounded-full text-lg font-medium overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
-                <span className="relative z-10">Start Reading</span>
-                <ChevronRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
-                <div className="absolute inset-0 bg-downy transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500 rounded-full" />
               </button>
             </div>
+
+            {/* Resume Prompt */}
+            {resumePage && (
+                 <div className="fixed bottom-10 right-10 z-50 animate-in slide-in-from-right duration-500">
+                    <div className="bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-2xl border border-downy/20 max-w-sm">
+                        <div className="flex items-start gap-4">
+                            <div className="p-3 bg-downy/10 rounded-full text-downy">
+                                <BookOpen className="w-6 h-6" />
+                            </div>
+                            <div className="space-y-2">
+                                <h4 className="font-bold text-charcoal text-lg">Resume Reading?</h4>
+                                <p className="text-sm text-charcoal/70">
+                                    You left off on <span className="font-bold text-downy">page {resumePage}</span>. Would you like to continue from there?
+                                </p>
+                                <div className="flex items-center gap-3 pt-2">
+                                    <button 
+                                        onClick={() => {
+                                            setPageNumber(resumePage);
+                                            setResumePage(null);
+                                            handleStartReading();
+                                        }}
+                                        className="px-4 py-2 bg-downy text-white text-sm font-semibold rounded-lg hover:bg-downy-dark transition-colors"
+                                    >
+                                        Yes, Resume
+                                    </button>
+                                    <button 
+                                        onClick={() => setResumePage(null)}
+                                        className="px-4 py-2 text-charcoal/60 text-sm font-medium hover:text-charcoal transition-colors"
+                                    >
+                                        No, Thanks
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Book Cover */}
             <div className="flex-1 w-full max-w-[280px] sm:max-w-sm md:max-w-xl relative animate-in slide-in-from-right duration-700 delay-100 mx-auto md:mx-0">
