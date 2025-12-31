@@ -402,6 +402,8 @@ const ReadBook = () => {
                     bookId={book.id} 
                     className="rounded-2xl shadow-lg border border-cream h-full"
                     onClose={() => setIsInteractive(false)}
+                    initialDiscussionId={state?.discussionId}
+                    highlightCommentId={state?.highlightCommentId}
                    />
                 </div>
                )}
