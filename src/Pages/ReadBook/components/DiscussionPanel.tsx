@@ -1,5 +1,6 @@
-import { useEffect, useState, useCallback } from "react";
-import { MessageSquare, Send, X, Plus, ChevronDown, ChevronUp, Reply, Heart } from "lucide-react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { MessageSquare, Send, X, Plus, ChevronDown, ChevronUp, Reply, Heart, Smile } from "lucide-react";
+import EmojiPicker from "emoji-picker-react";
 import { useForm } from "react-hook-form";
 import type { Discussion, Comment, Identifier } from "@/types";
 import { apiClient } from "@/services/api";
@@ -127,13 +128,15 @@ const DiscussionPanel = ({ bookId, onClose, className = "", initialDiscussionId,
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+      <div className="flex-1 min-h-0 flex flex-col bg-white relative">
         {showNewDiscussion ? (
-          <NewDiscussionForm
-            bookId={bookId}
-            onCancel={() => setShowNewDiscussion(false)}
-            onSuccess={handleDiscussionCreated}
-          />
+          <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+            <NewDiscussionForm
+              bookId={bookId}
+              onCancel={() => setShowNewDiscussion(false)}
+              onSuccess={handleDiscussionCreated}
+            />
+          </div>
         ) : activeDiscussion ? (
           <DiscussionDetail
             discussion={activeDiscussion}
@@ -142,7 +145,7 @@ const DiscussionPanel = ({ bookId, onClose, className = "", initialDiscussionId,
             highlightCommentId={highlightCommentId}
           />
         ) : (
-          <div className="space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-4">
             {discussions.length > 0 ? (
                 discussions.map((discussion) => (
                   <div
@@ -251,7 +254,14 @@ const NewDiscussionForm = ({
   onCancel: () => void;
   onSuccess: (discussion: Discussion) => void;
 }) => {
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<{ title: string; body: string }>();
+  const { register, handleSubmit, setValue, getValues, watch, formState: { errors, isSubmitting } } = useForm<{ title: string; body: string }>();
+  const [showEmoji, setShowEmoji] = useState(false);
+  
+  const onEmojiClick = (emojiData: any) => {
+      const current = getValues("body") || "";
+      setValue("body", current + emojiData.emoji);
+      setShowEmoji(false);
+  };
 
   const onSubmit = async (data: { title: string; body: string }) => {
     try {
@@ -292,6 +302,16 @@ const NewDiscussionForm = ({
           rows={5}
           className="w-full px-4 py-2 rounded-xl border border-cream focus:outline-none focus:border-downy focus:ring-1 focus:ring-downy transition-all placeholder:text-charcoal/30 bg-white resize-none"
         />
+        <div className="flex justify-end mt-2 relative">
+             <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="text-gray-400 hover:text-downy transition-colors">
+                <Smile className="w-5 h-5" />
+             </button>
+             {showEmoji && (
+                 <div className="absolute right-0 bottom-full mb-2 z-50 shadow-xl rounded-xl">
+                     <EmojiPicker onEmojiClick={onEmojiClick} width={300} height={400} />
+                 </div>
+             )}
+        </div>
         {errors.body && <span className="text-xs text-red-500 mt-1">{errors.body.message}</span>}
       </div>
 
@@ -325,6 +345,12 @@ const DiscussionDetail = ({
   
   const [commentText, setCommentText] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [showEmoji, setShowEmoji] = useState(false);
+
+  const onEmojiClick = (emojiData: any) => {
+    setCommentText(prev => prev + emojiData.emoji);
+    setShowEmoji(false);
+  };
 
   const fetchComments = useCallback(async (pageNum: number, reset = false, isBackground = false) => {
     if (loading && !isBackground) return; 
@@ -432,7 +458,9 @@ const DiscussionDetail = ({
 
   return (
     <div className="flex flex-col h-full animate-in slide-in-from-right duration-300">
-      <button
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
+         <div className="p-4">
+            <button
         onClick={onBack}
         className="flex items-center gap-1 text-sm text-charcoal/50 hover:text-downy mb-4 w-fit transition-colors group"
       >
@@ -485,7 +513,7 @@ const DiscussionDetail = ({
       </div>
 
       {/* Comments List */}
-      <div className="flex-1 overflow-y-auto mb-4 custom-scrollbar pr-2">
+      <div className="pr-2">
          {comments.length > 0 ? (
             <div className="space-y-4">
                 {comments.map(c => (
@@ -509,23 +537,37 @@ const DiscussionDetail = ({
               </button>
             )}
       </div>
+      </div>
+      </div>
 
       {/* Comment Input */}
-      <form onSubmit={handleSendComment} className="mt-auto pt-2 bg-white">
+      <form onSubmit={handleSendComment} className="mt-auto p-4 bg-white border-t border-cream">
         <div className="relative">
           <input
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
             placeholder="Type a comment..."
-            className="w-full pl-4 pr-12 py-3 bg-cream/20 border border-cream rounded-xl focus:outline-none focus:border-downy focus:ring-1 focus:ring-downy transition-all text-sm"
+            className="w-full pl-4 pr-24 py-3 bg-cream/20 border border-cream rounded-xl focus:outline-none focus:border-downy focus:ring-1 focus:ring-downy transition-all text-sm"
           />
-          <button
-            type="submit"
-            disabled={!commentText.trim() || submitting}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-downy text-white rounded-full disabled:opacity-50 disabled:bg-gray-300 hover:bg-downy-dark transition-colors flex items-center justify-center shadow-sm"
-          >
-            <Send className="w-4 h-4" />
-          </button>
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+             <div className="relative">
+                <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-2 text-gray-400 hover:text-downy transition-colors">
+                    <Smile className="w-5 h-5" />
+                </button>
+                {showEmoji && (
+                    <div className="absolute right-0 bottom-full mb-2 z-50 shadow-xl rounded-xl">
+                        <EmojiPicker onEmojiClick={onEmojiClick} width={300} height={400} />
+                    </div>
+                )}
+             </div>
+             <button
+               type="submit"
+               disabled={!commentText.trim() || submitting}
+               className="p-2 bg-downy text-white rounded-full disabled:opacity-50 disabled:bg-gray-300 hover:bg-downy-dark transition-colors flex items-center justify-center shadow-sm"
+             >
+               <Send className="w-4 h-4" />
+             </button>
+          </div>
         </div>
       </form>
     </div>
@@ -536,7 +578,14 @@ const CommentItem = ({ comment, discussionId, currentUser, depth = 0 }: { commen
     const [isReplying, setIsReplying] = useState(false);
     const [replyText, setReplyText] = useState("");
     const [replies, setReplies] = useState<Comment[]>(comment.replies || []);
+
     const [submitting, setSubmitting] = useState(false);
+    const [showEmoji, setShowEmoji] = useState(false);
+    
+    const onEmojiClick = (emojiData: any) => {
+        setReplyText(prev => prev + emojiData.emoji);
+        setShowEmoji(false);
+    };
     
     // We update local replies state if initial props change (unlikely unless re-fetch)
     useEffect(() => {
@@ -649,9 +698,20 @@ const CommentItem = ({ comment, discussionId, currentUser, depth = 0 }: { commen
                         value={replyText}
                         onChange={e => setReplyText(e.target.value)}
                         placeholder="Write a reply..."
+
                         className="flex-1 px-3 py-1.5 text-sm bg-white border border-cream rounded-lg focus:outline-none focus:border-downy"
                         autoFocus
                     />
+                    <div className="relative">
+                         <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-1.5 text-gray-400 hover:text-downy">
+                             <Smile className="w-4 h-4" />
+                         </button>
+                         {showEmoji && (
+                             <div className="absolute right-0 top-full mt-2 z-50 shadow-xl rounded-xl">
+                                 <EmojiPicker onEmojiClick={onEmojiClick} width={280} height={350} />
+                             </div>
+                         )}
+                    </div>
                     <button 
                         type="submit" 
                         disabled={submitting || !replyText.trim()}
