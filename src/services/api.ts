@@ -75,4 +75,16 @@ export const apiClient = {
     const response = await axiosInstance.patch(`/books/${bookId}/reading_position`, data);
     return response.data;
   },
+  getNotifications: async (page = 1) => {
+    const response = await axiosInstance.get<{ data: any[]; meta: { unread_count: number; total_pages: number } }>(`/notifications?page=${page}`);
+    return response.data;
+  },
+  markNotificationAsRead: async (id: string | number) => {
+    const response = await axiosInstance.patch(`/notifications/${id}/mark_as_read`);
+    return response.data;
+  },
+  markAllNotificationsAsRead: async () => {
+    const response = await axiosInstance.patch(`/notifications/mark_all_as_read`);
+    return response.data;
+  },
 };

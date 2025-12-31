@@ -66,6 +66,7 @@ export interface User {
   home_church?: string;
   date_of_birth?: string;
   avatar_url?: string;
+  email_notifications?: boolean;
   token?: string;
 }
 

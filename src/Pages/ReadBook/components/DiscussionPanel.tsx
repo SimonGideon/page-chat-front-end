@@ -10,6 +10,8 @@ interface DiscussionPanelProps {
   bookId: Identifier;
   onClose?: () => void;
   className?: string;
+  initialDiscussionId?: Identifier;
+  highlightCommentId?: Identifier;
 }
 
 const getTwoNames = (user: any) => {
@@ -19,7 +21,7 @@ const getTwoNames = (user: any) => {
   return `${first} ${last}`.trim().split(/\s+/).slice(0, 2).join(" ");
 };
 
-const DiscussionPanel = ({ bookId, onClose, className = "" }: DiscussionPanelProps) => {
+const DiscussionPanel = ({ bookId, onClose, className = "", initialDiscussionId, highlightCommentId }: DiscussionPanelProps) => {
 
   const [discussions, setDiscussions] = useState<Discussion[]>([]);
   const [totalDiscussions, setTotalDiscussions] = useState(0);
@@ -62,6 +64,19 @@ const DiscussionPanel = ({ bookId, onClose, className = "" }: DiscussionPanelPro
     setPage(1);
     fetchDiscussions(1, true);
   }, [bookId]);
+
+  // Handle deep link to discussion
+  const [initialProcessed, setInitialProcessed] = useState(false);
+  useEffect(() => {
+      if (initialDiscussionId && discussions.length > 0 && !initialProcessed) {
+          // Identify if we have the discussion
+          const target = discussions.find(d => String(d.id) === String(initialDiscussionId));
+          if (target) {
+              setActiveDiscussion(target);
+              setInitialProcessed(true);
+          }
+      }
+  }, [discussions, initialDiscussionId, initialProcessed]);
 
   const loadMore = () => {
     if (!loading && hasMore) {
@@ -124,6 +139,7 @@ const DiscussionPanel = ({ bookId, onClose, className = "" }: DiscussionPanelPro
             discussion={activeDiscussion}
             onBack={() => setActiveDiscussion(null)}
             currentUser={user}
+            highlightCommentId={highlightCommentId}
           />
         ) : (
           <div className="space-y-4">
@@ -295,10 +311,12 @@ const DiscussionDetail = ({
   discussion,
   onBack,
   currentUser,
+  highlightCommentId,
 }: {
   discussion: Discussion;
   onBack: () => void;
   currentUser: any;
+  highlightCommentId?: Identifier;
 }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(false);
@@ -346,6 +364,21 @@ const DiscussionDetail = ({
     setPage(1);
     fetchComments(1, true);
   }, [fetchComments]);
+
+  // Handle scroll to highlighted comment
+  useEffect(() => {
+      if (highlightCommentId && comments.length > 0) {
+          // Allow render time
+          setTimeout(() => {
+              const element = document.getElementById(`comment-${highlightCommentId}`);
+              if (element) {
+                  element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  element.classList.add('bg-downy/10'); // Highlight effect
+                  setTimeout(() => element.classList.remove('bg-downy/10'), 2000);
+              }
+          }, 500);
+      }
+  }, [highlightCommentId, comments]);
 
   // Heartbeat Polling
   useEffect(() => {
@@ -568,7 +601,7 @@ const CommentItem = ({ comment, discussionId, currentUser, depth = 0 }: { commen
     }
 
     return (
-        <div className={`flex flex-col gap-2 ${depth > 0 ? "ml-3 border-l md:ml-4 border-cream pl-2 md:pl-3" : ""}`}>
+        <div id={`comment-${comment.id}`} className={`flex flex-col gap-2 transition-colors duration-500 rounded-lg p-1 ${depth > 0 ? "ml-3 border-l md:ml-4 border-cream pl-2 md:pl-3" : ""}`}>
             <div className="flex gap-3">
                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-cream flex items-center justify-center text-charcoal/60 text-xs font-bold overflow-hidden border border-cream">
                     {comment.user?.avatar_url ? (

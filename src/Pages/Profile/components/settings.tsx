@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Key, Loader2, Lock } from "lucide-react";
-import { useState } from "react";
+import { Eye, EyeOff, Key, Loader2, Lock, Bell } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -16,6 +16,8 @@ import {
   toast,
 } from "@/components/ui";
 import axiosInstance from "@/redux/utils/axiosInstance";
+import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { setUser } from "@/redux/features/authSlice";
 
 const PasswordSchema = z
   .object({
@@ -46,6 +48,46 @@ const Settings = () => {
       confirm_password: "",
     },
   });
+
+  const { user } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [updatingNotifs, setUpdatingNotifs] = useState(false);
+
+  useEffect(() => {
+    if (user?.email_notifications !== undefined) {
+      setEmailNotifications(user.email_notifications);
+    }
+  }, [user]);
+
+  const handleEmailToggle = async () => {
+    if (!user) return;
+    const newValue = !emailNotifications;
+    setEmailNotifications(newValue); // Optimistic
+    setUpdatingNotifs(true);
+
+    try {
+      await axiosInstance.patch(`/users/${user.id}`, {
+        user: { email_notifications: newValue }
+      });
+      dispatch(setUser({ ...user, email_notifications: newValue }));
+      toast({
+        title: "Preferences Updated",
+        description: `Email notifications ${newValue ? "enabled" : "disabled"}.`,
+        variant: "success",
+      });
+    } catch (error) {
+      setEmailNotifications(!newValue); // Revert
+      console.error(error);
+      toast({
+        title: "Error",
+        description: "Failed to update preferences.",
+        variant: "destructive",
+      });
+    } finally {
+        setUpdatingNotifs(false);
+    }
+  };
 
   const onSubmit = async (data: PasswordFormValues) => {
     setIsSubmitting(true);
@@ -84,6 +126,32 @@ const Settings = () => {
 
   return (
     <div className="space-y-6">
+
+
+      <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm mb-8">
+         <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+                <h3 className="text-base font-medium text-gray-900 flex items-center gap-2">
+                    <Bell className="w-4 h-4 text-downy" />
+                    Email Notifications
+                </h3>
+                <p className="text-sm text-gray-500">
+                    Receive emails for likes, replies, and comments.
+                </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                    type="checkbox" 
+                    className="sr-only peer" 
+                    checked={emailNotifications}
+                    onChange={handleEmailToggle}
+                    disabled={updatingNotifs}
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-downy/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-downy"></div>
+            </label>
+         </div>
+      </div>
+
       <div>
         <h2 className="text-lg sm:text-xl font-semibold text-gray-900 flex items-center gap-2">
           <Key className="w-5 h-5 text-downy" />
