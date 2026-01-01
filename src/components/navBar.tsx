@@ -87,10 +87,14 @@ const NavBar = () => {
   const toggleNotifPopup = () => setIsNotifPopupVisible((prev) => !prev);
 
   const handleNotificationClick = async (notification: any) => {
-    if (!notification.read_at) {
-        apiClient.markNotificationAsRead(notification.id).catch(console.error);
-        setUnreadCount(prev => Math.max(0, prev - 1));
-        setNotifications(prev => prev.map(n => n.id === notification.id ? {...n, read_at: new Date().toISOString()} : n));
+    try {
+      if (!notification.read_at) {
+          await apiClient.markNotificationAsRead(notification.id);
+          setUnreadCount(prev => Math.max(0, prev - 1));
+          setNotifications(prev => prev.filter(n => n.id !== notification.id));
+      }
+    } catch (error) {
+      console.error("Failed to mark notification as read", error);
     }
     
     setIsNotifPopupVisible(false);
@@ -109,7 +113,7 @@ const NavBar = () => {
   const handleMarkAllRead = async () => {
       await apiClient.markAllNotificationsAsRead();
       setUnreadCount(0);
-      setNotifications(prev => prev.map(n => ({ ...n, read_at: new Date().toISOString() })));
+      setNotifications([]);
   };
 
   return (

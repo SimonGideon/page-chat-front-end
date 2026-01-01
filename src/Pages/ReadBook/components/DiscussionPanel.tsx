@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from "react";
-import { MessageSquare, Send, X, Plus, ChevronDown, ChevronUp, Reply, Heart, Smile } from "lucide-react";
+import { MessageSquare, Send, X, Plus, ChevronDown, ChevronUp, Reply, Heart, Smile, MoreHorizontal, Flag, AlertTriangle } from "lucide-react";
 import EmojiPicker from "emoji-picker-react";
 import { useForm } from "react-hook-form";
 import type { Discussion, Comment, Identifier } from "@/types";
@@ -35,6 +35,24 @@ const DiscussionPanel = ({ bookId, onClose, className = "", initialDiscussionId,
   );
   const [showNewDiscussion, setShowNewDiscussion] = useState(false);
   const { user } = useAppSelector((state) => state.auth);
+
+  const [reportItem, setReportItem] = useState<{ id: string | number; type: "Discussion" | "Comment" } | null>(null);
+
+  const handleReport = async (reason: string) => {
+    if (!reportItem) return;
+    try {
+      await apiClient.reportContent({
+        reportable_id: reportItem.id,
+        reportable_type: reportItem.type,
+        reason,
+      });
+      // Optionally show success toast
+      setReportItem(null);
+    } catch (error) {
+       console.error("Failed to report content", error);
+       alert("Failed to allow report. You may have already reported this content.");
+    }
+  };
 
   const fetchDiscussions = async (pageNum: number, reset = false) => {
     if (loading) return;
@@ -143,6 +161,8 @@ const DiscussionPanel = ({ bookId, onClose, className = "", initialDiscussionId,
             onBack={() => setActiveDiscussion(null)}
             currentUser={user}
             highlightCommentId={highlightCommentId}
+            onReport={(id) => setReportItem({ id, type: "Discussion" })}
+            onReportComment={(id) => setReportItem({ id, type: "Comment" })}
           />
         ) : (
           <div className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-4">
@@ -240,8 +260,51 @@ const DiscussionPanel = ({ bookId, onClose, className = "", initialDiscussionId,
           </div>
         )}
       </div>
+      <ReportModal 
+        isOpen={!!reportItem} 
+        onClose={() => setReportItem(null)} 
+        onSubmit={handleReport} 
+      />
     </div>
   );
+};
+
+const ReportModal = ({ isOpen, onClose, onSubmit }: { isOpen: boolean; onClose: () => void; onSubmit: (reason: string) => void }) => {
+    const [reason, setReason] = useState("");
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
+             <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl animate-in fade-in zoom-in duration-200">
+                <div className="flex items-center gap-3 mb-4 text-red-500">
+                    <AlertTriangle className="w-6 h-6" />
+                    <h3 className="text-lg font-bold text-charcoal">Report Content</h3>
+                </div>
+                <p className="text-sm text-charcoal/60 mb-4">
+                    Please help us keep this community safe. Why are you reporting this content?
+                </p>
+                
+                <textarea
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                    placeholder="Provide a reason (optional)..."
+                    className="w-full p-3 bg-cream/20 border border-cream rounded-xl text-sm mb-4 focus:outline-none focus:border-red-400 min-h-[100px]"
+                />
+                
+                <div className="flex gap-2 justify-end">
+                    <button onClick={onClose} className="px-4 py-2 text-sm text-charcoal/60 hover:bg-cream/50 rounded-lg transition-colors">
+                        Cancel
+                    </button>
+                    <button 
+                        onClick={() => onSubmit(reason)}
+                        className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium shadow-sm shadow-red-200"
+                    >
+                        Submit Report
+                    </button>
+                </div>
+             </div>
+        </div>
+    );
 };
 
 // ... NewDiscussionForm remains same ...
@@ -332,11 +395,15 @@ const DiscussionDetail = ({
   onBack,
   currentUser,
   highlightCommentId,
+  onReport,
+  onReportComment,
 }: {
   discussion: Discussion;
   onBack: () => void;
   currentUser: any;
   highlightCommentId?: Identifier;
+  onReport: (id: Identifier) => void;
+  onReportComment: (id: Identifier) => void;
 }) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(false);
@@ -346,6 +413,8 @@ const DiscussionDetail = ({
   const [commentText, setCommentText] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
+
+  const isHidden = (discussion as any).status === "hidden" || (discussion as any).status === 2;
 
   const onEmojiClick = (emojiData: any) => {
     setCommentText(prev => prev + emojiData.emoji);
@@ -461,83 +530,81 @@ const DiscussionDetail = ({
       <div className="flex-1 overflow-y-auto custom-scrollbar">
          <div className="p-4">
             <button
-        onClick={onBack}
-        className="flex items-center gap-1 text-sm text-charcoal/50 hover:text-downy mb-4 w-fit transition-colors group"
-      >
-        <div className="p-1 rounded-full group-hover:bg-cream transition-colors">
-            <ChevronLeftIcon className="w-4 h-4" />
-        </div>
-        Back to list
-      </button>
+              onClick={onBack}
+              className="flex items-center gap-1 text-sm text-charcoal/50 hover:text-downy mb-4 w-fit transition-colors group"
+            >
+              <div className="p-1 rounded-full group-hover:bg-cream transition-colors">
+                  <ChevronLeftIcon className="w-4 h-4" />
+              </div>
+              Back to list
+            </button>
 
-      {/* Discussion Header / Main Post */}
-      <div className="mb-4 bg-cream/10 p-3 rounded-2xl border border-cream">
-        {/* Author Info */}
-        <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full border border-cream overflow-hidden bg-white flex-shrink-0">
-                    {discussion.user?.avatar_url ? (
-                         <img src={discussion.user.avatar_url} alt={discussion.user.first_name} className="w-full h-full object-cover" />
-                    ) : (
-                        <div className="w-full h-full bg-downy/10 flex items-center justify-center text-downy font-bold text-xs">
-                            {discussion.user?.first_name?.[0]?.toUpperCase() || "A"}
-                        </div>
-                    )}
-                </div>
-                <div>
-                    <h4 className="text-xs font-semibold text-charcoal">
-                        {discussion.user ? getTwoNames(discussion.user) : "Anonymous"}
-                    </h4>
-                    <p className="text-[10px] text-charcoal/50">
-                    <p className="text-[10px] text-charcoal/50">
-                        {formatRelativeTime(discussion.created_at)}
-                    </p>
-                    </p>
-                </div>
+            {/* Discussion Header / Main Post */}
+            <div className="mb-4 bg-cream/10 p-3 rounded-2xl border border-cream">
+              {/* Author Info */}
+              <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full border border-cream overflow-hidden bg-white flex-shrink-0">
+                          {discussion.user?.avatar_url ? (
+                               <img src={discussion.user.avatar_url} alt={discussion.user.first_name} className="w-full h-full object-cover" />
+                          ) : (
+                              <div className="w-full h-full bg-downy/10 flex items-center justify-center text-downy font-bold text-xs">
+                                  {discussion.user?.first_name?.[0]?.toUpperCase() || "A"}
+                              </div>
+                          )}
+                      </div>
+                      <div>
+                          <h4 className="text-xs font-semibold text-charcoal">
+                              {discussion.user ? getTwoNames(discussion.user) : "Anonymous"}
+                          </h4>
+                          <p className="text-[10px] text-charcoal/50">
+                              {formatRelativeTime(discussion.created_at)}
+                          </p>
+                      </div>
+                  </div>
+                  {!isHidden && currentUser?.id !== discussion.user_id && <SimpleMoreMenu onReport={() => onReport(discussion.id)} />}
+              </div>
             </div>
-            {/* Optional: Add share/menu options here */}
-        </div>
 
-        <h1 className="text-lg font-bold text-charcoal mb-2 leading-tight tracking-tight">
-          {discussion.title}
-        </h1>
-        
-        <div className="prose prose-sm max-w-none text-charcoal/80 leading-relaxed font-serif text-sm">
-            <p className="whitespace-pre-wrap">{discussion.body}</p>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-2 mb-4 px-2">
-         <h4 className="text-sm font-semibold text-charcoal">Comments</h4>
-         <span className="bg-cream px-2 py-0.5 rounded-full text-xs text-charcoal/60 font-medium">{comments.length}</span>
-      </div>
-
-      {/* Comments List */}
-      <div className="pr-2">
-         {comments.length > 0 ? (
-            <div className="space-y-4">
-                {comments.map(c => (
-                    <CommentItem key={c.id} comment={c} discussionId={discussion.id} currentUser={currentUser} />
-                ))}
+            <h1 className={`text-lg font-bold text-charcoal mb-2 leading-tight tracking-tight ${isHidden ? "italic text-charcoal/40" : ""}`}>
+              {discussion.title}
+            </h1>
+            
+            <div className="prose prose-sm max-w-none text-charcoal/80 leading-relaxed font-serif text-sm">
+                <p className={`whitespace-pre-wrap ${isHidden ? "italic text-charcoal/40" : ""}`}>{discussion.body}</p>
             </div>
-         ) : !loading && (
-             <p className="text-center text-sm text-charcoal/40 italic py-8">
-                No comments yet. Be the first to join the conversation!
-              </p>
-         )}
-         
-         {loading && <div className="text-center py-4 text-xs text-charcoal/40">Loading comments...</div>}
-         
-         {!loading && hasMore && comments.length > 0 && (
-              <button 
-                onClick={loadMoreComments}
-                className="w-full py-2 text-xs text-downy hover:bg-cream/30 rounded-lg transition-colors mt-2"
-              >
-                Load more comments
-              </button>
-            )}
-      </div>
-      </div>
+
+            <div className="flex items-center gap-2 mb-4 px-2 mt-6">
+               <h4 className="text-sm font-semibold text-charcoal">Comments</h4>
+               <span className="bg-cream px-2 py-0.5 rounded-full text-xs text-charcoal/60 font-medium">{comments.length}</span>
+            </div>
+
+            {/* Comments List */}
+            <div className="pr-2">
+               {comments.length > 0 ? (
+                  <div className="space-y-4">
+                      {comments.map(c => (
+                          <CommentItem key={c.id} comment={c} discussionId={discussion.id} currentUser={currentUser} onReport={onReportComment} />
+                      ))}
+                  </div>
+               ) : !loading && (
+                   <p className="text-center text-sm text-charcoal/40 italic py-8">
+                      No comments yet. Be the first to join the conversation!
+                    </p>
+               )}
+               
+               {loading && <div className="text-center py-4 text-xs text-charcoal/40">Loading comments...</div>}
+               
+               {!loading && hasMore && comments.length > 0 && (
+                    <button 
+                      onClick={loadMoreComments}
+                      className="w-full py-2 text-xs text-downy hover:bg-cream/30 rounded-lg transition-colors mt-2"
+                    >
+                      Load more comments
+                    </button>
+                  )}
+            </div>
+         </div>
       </div>
 
       {/* Comment Input */}
@@ -574,7 +641,7 @@ const DiscussionDetail = ({
   );
 };
 
-const CommentItem = ({ comment, discussionId, currentUser, depth = 0 }: { comment: Comment, discussionId: Identifier, currentUser: any, depth?: number }) => {
+const CommentItem = ({ comment, discussionId, currentUser, onReport, depth = 0 }: { comment: Comment, discussionId: Identifier, currentUser: any, onReport: (id: Identifier) => void, depth?: number }) => {
     const [isReplying, setIsReplying] = useState(false);
     const [replyText, setReplyText] = useState("");
     const [replies, setReplies] = useState<Comment[]>(comment.replies || []);
@@ -594,6 +661,10 @@ const CommentItem = ({ comment, discussionId, currentUser, depth = 0 }: { commen
 
     const [liked, setLiked] = useState(comment.is_liked || false);
     const [likesCount, setLikesCount] = useState(comment.likes_count || 0);
+    
+    // Status Logic
+    const isHidden = (comment as any).status === "hidden" || (comment as any).status === 2; // Check both enum val and string if API serializes differently
+
 
     const toggleLike = async () => {
         const originalLiked = liked;
@@ -664,11 +735,14 @@ const CommentItem = ({ comment, discussionId, currentUser, depth = 0 }: { commen
                         <span className="text-xs font-semibold text-charcoal">
                             {comment.user?.first_name || "User"}
                         </span>
-                         <span className="text-[10px] text-charcoal/40">
-                            {formatRelativeTime(comment.created_at)}
-                          </span>
+                        <div className="flex items-center gap-2">
+                             <span className="text-[10px] text-charcoal/40">
+                                {formatRelativeTime(comment.created_at)}
+                              </span>
+                              {!isHidden && currentUser?.id !== comment.user_id && <SimpleMoreMenu onReport={() => onReport(comment.id)} />}
+                        </div>
                     </div>
-                    <p className="text-sm text-charcoal/80 leading-relaxed">
+                    <p className={`text-sm text-charcoal/80 leading-relaxed ${isHidden ? "italic text-charcoal/40" : ""}`}>
                         {comment.body}
                     </p>
                     
@@ -731,6 +805,7 @@ const CommentItem = ({ comment, discussionId, currentUser, depth = 0 }: { commen
                             comment={reply} 
                             discussionId={discussionId} 
                             currentUser={currentUser}
+                            onReport={onReport}
                             depth={depth + 1} 
                         />
                     ))}
@@ -753,8 +828,40 @@ const ChevronLeftIcon = ({ className }: { className?: string }) => (
     strokeLinejoin="round"
     className={className}
   >
-    <path d="m15 18-6-6 6-6" />
   </svg>
 );
+
+const SimpleMoreMenu = ({ onReport }: { onReport: () => void }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={ref}>
+      <button onClick={() => setOpen(!open)} className="text-charcoal/40 hover:text-charcoal transition-colors p-1 rounded-full hover:bg-cream/50">
+        <MoreHorizontal className="w-4 h-4" />
+      </button>
+      {open && (
+        <div className="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg border border-cream z-10 overflow-hidden animate-in fade-in zoom-in-95 duration-100">
+            <button 
+                onClick={() => { onReport(); setOpen(false); }}
+                className="w-full text-left px-4 py-2 text-xs text-red-500 hover:bg-red-50 flex items-center gap-2"
+            >
+                <Flag className="w-3 h-3" /> Report
+            </button>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default DiscussionPanel;
