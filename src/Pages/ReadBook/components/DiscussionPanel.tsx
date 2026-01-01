@@ -405,6 +405,7 @@ const DiscussionDetail = ({
   onReport: (id: Identifier) => void;
   onReportComment: (id: Identifier) => void;
 }) => {
+  /* Data State */
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -434,17 +435,8 @@ const DiscussionDetail = ({
         return [...prev, ...data];
       });
       
-      // Pagination logic
       setHasMore((prevHasMore) => {
-          // If we are resetting, we check if data < total
           if (reset) return data.length < total;
-          // If appending, we need the *new* length. 
-          // Since we can't easily access 'new-prev', we might rely on the closure 'comments.length' 
-          // BUT 'comments' might be stale if we don't depend on it. 
-          // Safer: Calculate based on pageNum * per_page (10) vs total? 
-          // Or just allow a minor inconsistency. 
-          // Best fix: pass a functional update or rely on updated logic.
-          // For now, let's use the simplest logic that worked before but fixed for key dependencies.
           return (pageNum * 10) < total; 
       });
 
@@ -460,32 +452,20 @@ const DiscussionDetail = ({
     fetchComments(1, true);
   }, [fetchComments]);
 
+
   // Handle scroll to highlighted comment
   useEffect(() => {
       if (highlightCommentId && comments.length > 0) {
-          // Allow render time
           setTimeout(() => {
               const element = document.getElementById(`comment-${highlightCommentId}`);
               if (element) {
                   element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  element.classList.add('bg-downy/10'); // Highlight effect
+                  element.classList.add('bg-downy/10');
                   setTimeout(() => element.classList.remove('bg-downy/10'), 2000);
               }
           }, 500);
       }
   }, [highlightCommentId, comments]);
-
-  // Heartbeat Polling
-  useEffect(() => {
-    const interval = setInterval(() => {
-        // Only refresh if we are on page 1 (MVP: simplest way to avoid pagination conflict)
-        if (page === 1 && !loading) {
-            fetchComments(1, true, true);
-        }
-    }, 10000); // 10 seconds
-
-    return () => clearInterval(interval);
-  }, [fetchComments, page, loading]);
 
   const loadMoreComments = () => {
      if (!loading && hasMore) {
@@ -501,9 +481,8 @@ const DiscussionDetail = ({
 
     setSubmitting(true);
     try {
-      const response = await apiClient.createComment(String(discussion.id), {
-        body: commentText,
-      });
+      const payload: any = { body: commentText };
+      const response = await apiClient.createComment(String(discussion.id), payload);
        const newComment = (response as any).data || response;
         const commentWithUser = {
             ...newComment,
@@ -539,9 +518,8 @@ const DiscussionDetail = ({
               Back to list
             </button>
 
-            {/* Discussion Header / Main Post */}
+            {/* Discussion Header */}
             <div className="mb-4 bg-cream/10 p-3 rounded-2xl border border-cream">
-              {/* Author Info */}
               <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full border border-cream overflow-hidden bg-white flex-shrink-0">
@@ -579,18 +557,24 @@ const DiscussionDetail = ({
                <span className="bg-cream px-2 py-0.5 rounded-full text-xs text-charcoal/60 font-medium">{comments.length}</span>
             </div>
 
-            {/* Comments List */}
+            {/* List */}
             <div className="pr-2">
                {comments.length > 0 ? (
                   <div className="space-y-4">
                       {comments.map(c => (
-                          <CommentItem key={c.id} comment={c} discussionId={discussion.id} currentUser={currentUser} onReport={onReportComment} />
+                          <CommentItem 
+                            key={c.id} 
+                            comment={c} 
+                            discussionId={discussion.id} 
+                            currentUser={currentUser} 
+                            onReport={onReportComment}
+                          />
                       ))}
                   </div>
                ) : !loading && (
-                   <p className="text-center text-sm text-charcoal/40 italic py-8">
+                   <div className="text-center text-sm text-charcoal/40 italic py-8">
                       No comments yet. Be the first to join the conversation!
-                    </p>
+                    </div>
                )}
                
                {loading && <div className="text-center py-4 text-xs text-charcoal/40">Loading comments...</div>}
@@ -641,36 +625,45 @@ const DiscussionDetail = ({
   );
 };
 
-const CommentItem = ({ comment, discussionId, currentUser, onReport, depth = 0 }: { comment: Comment, discussionId: Identifier, currentUser: any, onReport: (id: Identifier) => void, depth?: number }) => {
+const CommentItem = ({ 
+  comment, 
+  discussionId, 
+  currentUser, 
+  onReport,
+  depth = 0
+}: { 
+  comment: Comment, 
+  discussionId: Identifier, 
+  currentUser: any, 
+  onReport: (id: Identifier) => void,
+  depth?: number
+}) => {
+    const [replies, setReplies] = useState<Comment[]>(comment.replies || []);
+    const [liked, setLiked] = useState(comment.is_liked || false);
+    const [likesCount, setLikesCount] = useState(comment.likes_count || 0);
+    const [showReplies, setShowReplies] = useState(false);
     const [isReplying, setIsReplying] = useState(false);
     const [replyText, setReplyText] = useState("");
-    const [replies, setReplies] = useState<Comment[]>(comment.replies || []);
-
     const [submitting, setSubmitting] = useState(false);
     const [showEmoji, setShowEmoji] = useState(false);
-    
-    const onEmojiClick = (emojiData: any) => {
-        setReplyText(prev => prev + emojiData.emoji);
-        setShowEmoji(false);
-    };
-    
-    // We update local replies state if initial props change (unlikely unless re-fetch)
+
+    // Update local replies if props change
     useEffect(() => {
         if(comment.replies) setReplies(comment.replies);
     }, [comment.replies]);
 
-    const [liked, setLiked] = useState(comment.is_liked || false);
-    const [likesCount, setLikesCount] = useState(comment.likes_count || 0);
-    
-    // Status Logic
-    const isHidden = (comment as any).status === "hidden" || (comment as any).status === 2; // Check both enum val and string if API serializes differently
+    const isHidden = (comment as any).status === "hidden" || (comment as any).status === 2;
 
+    const onEmojiClick = (emojiData: any) => {
+        setReplyText(prev => prev + emojiData.emoji);
+        setShowEmoji(false);
+    };
 
-    const toggleLike = async () => {
+    const toggleLike = async (e: React.MouseEvent) => {
+        e.stopPropagation();
         const originalLiked = liked;
         const originalCount = likesCount;
 
-        // Optimistic UI update
         setLiked(!liked);
         setLikesCount(liked ? likesCount - 1 : likesCount + 1);
 
@@ -682,7 +675,6 @@ const CommentItem = ({ comment, discussionId, currentUser, onReport, depth = 0 }
             }
         } catch (error) {
             console.error("Failed to toggle like", error);
-            // Revert on error
             setLiked(originalLiked);
             setLikesCount(originalCount);
         }
@@ -701,7 +693,7 @@ const CommentItem = ({ comment, discussionId, currentUser, onReport, depth = 0 }
              const newReply = (response as any).data || response;
              const replyWithUser = {
                 ...newReply,
-                 user: { // Fallback user info
+                 user: { 
                     first_name: currentUser?.first_name || 'Me',
                     last_name: currentUser?.last_name || '',
                     avatar_url: currentUser?.avatar_url,
@@ -713,6 +705,7 @@ const CommentItem = ({ comment, discussionId, currentUser, onReport, depth = 0 }
              setReplies([...replies, replyWithUser]);
              setIsReplying(false);
              setReplyText("");
+             setShowReplies(true); // Auto-expand to show new reply
         } catch(error) {
              console.error("Failed to reply", error);
         } finally {
@@ -721,43 +714,69 @@ const CommentItem = ({ comment, discussionId, currentUser, onReport, depth = 0 }
     }
 
     return (
-        <div id={`comment-${comment.id}`} className={`flex flex-col gap-2 transition-colors duration-500 rounded-lg p-1 ${depth > 0 ? "ml-3 border-l md:ml-4 border-cream pl-2 md:pl-3" : ""}`}>
+        <div id={`comment-${comment.id}`} className={`flex flex-col gap-2 transition-colors duration-200 rounded-lg p-2 hover:bg-cream/10`}>
             <div className="flex gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-cream flex items-center justify-center text-charcoal/60 text-xs font-bold overflow-hidden border border-cream">
+                <div className={`flex-shrink-0 rounded-full bg-cream flex items-center justify-center text-charcoal/60 font-bold overflow-hidden border border-cream w-8 h-8 text-xs`}>
                     {comment.user?.avatar_url ? (
                         <img src={comment.user.avatar_url} alt={comment.user.first_name} className="w-full h-full object-cover" />
                     ) : (
                         <span>{comment.user?.first_name?.[0] || "?"}</span>
                     )}
                 </div>
-                <div className="flex-1 bg-cream/20 p-2.5 rounded-2xl rounded-tl-none">
+                <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-semibold text-charcoal">
-                            {comment.user?.first_name || "User"}
-                        </span>
                         <div className="flex items-center gap-2">
-                             <span className="text-[10px] text-charcoal/40">
+                             <span className="font-semibold text-charcoal text-xs">
+                                {comment.user?.first_name || "User"}
+                            </span>
+                            <span className="text-[10px] text-charcoal/40">
                                 {formatRelativeTime(comment.created_at)}
-                              </span>
-                              {!isHidden && currentUser?.id !== comment.user_id && <SimpleMoreMenu onReport={() => onReport(comment.id)} />}
+                            </span>
                         </div>
+                        {!isHidden && currentUser?.id !== comment.user_id && (
+                            <div onClick={e => e.stopPropagation()}>
+                                <SimpleMoreMenu onReport={() => onReport(comment.id)} />
+                            </div>
+                        )}
                     </div>
-                    <p className={`text-sm text-charcoal/80 leading-relaxed ${isHidden ? "italic text-charcoal/40" : ""}`}>
+                    
+                    <p className={`text-charcoal/80 leading-relaxed text-sm ${isHidden ? "italic text-charcoal/40" : ""}`}>
                         {comment.body}
                     </p>
                     
-                    {/* Reply Action & Likes */}
-                    <div className="mt-2 flex items-center gap-4">
+                    {/* Actions */}
+                    <div className="mt-2 flex items-center gap-6">
+                         {/* Toggle Replies (if any) */}
                          <button 
-                            onClick={() => setIsReplying(!isReplying)}
-                            className="text-xs text-charcoal/40 hover:text-downy flex items-center gap-1 transition-colors group"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                if (replies.length > 0) setShowReplies(!showReplies);
+                                else setIsReplying(!isReplying);
+                            }}
+                            className={`text-xs flex items-center gap-1 transition-colors group ${showReplies ? 'text-downy' : 'text-charcoal/40 hover:text-downy'}`}
+                            title="Replies"
                         >
-                            <Reply className="w-3 h-3 group-hover:scale-110 transition-transform" /> Reply
+                            <MessageSquare className="w-3 h-3 group-hover:scale-110 transition-transform" /> 
+                            {replies.length > 0 ? `${replies.length} replies` : "Reply"}
                          </button>
+
+                         {/* Explicit Reply Button only if we have replies shown, otherwise the main button does it */}
+                         {replies.length > 0 && (
+                            <button 
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsReplying(!isReplying);
+                                }}
+                                className="text-xs text-charcoal/40 hover:text-downy flex items-center gap-1 transition-colors group"
+                            >
+                                <Reply className="w-3 h-3" /> Reply
+                            </button>
+                         )}
 
                          <button 
                             onClick={toggleLike}
                             className={`text-xs flex items-center gap-1 transition-colors group ${liked ? 'text-red-500' : 'text-charcoal/40 hover:text-red-400'}`}
+                            title="Like"
                          >
                             <Heart className={`w-3 h-3 transition-all ${liked ? 'fill-current scale-110' : 'group-hover:scale-110'}`} /> 
                             {likesCount > 0 && <span>{likesCount}</span>}
@@ -765,16 +784,17 @@ const CommentItem = ({ comment, discussionId, currentUser, onReport, depth = 0 }
                     </div>
                 </div>
             </div>
-            
+
+            {/* Inline Reply Form */}
             {isReplying && (
-                <form onSubmit={handleSendReply} className="ml-11 flex gap-2 animate-in slide-in-from-top-2 duration-200">
+                <form onSubmit={handleSendReply} className="ml-11 flex gap-2 animate-in slide-in-from-top-2 duration-200 mt-2">
                     <input 
                         value={replyText}
                         onChange={e => setReplyText(e.target.value)}
                         placeholder="Write a reply..."
-
                         className="flex-1 px-3 py-1.5 text-sm bg-white border border-cream rounded-lg focus:outline-none focus:border-downy"
                         autoFocus
+                        onClick={e => e.stopPropagation()}
                     />
                     <div className="relative">
                          <button type="button" onClick={() => setShowEmoji(!showEmoji)} className="p-1.5 text-gray-400 hover:text-downy">
@@ -796,24 +816,24 @@ const CommentItem = ({ comment, discussionId, currentUser, onReport, depth = 0 }
                 </form>
             )}
 
-            {/* Nested Replies */}
-            {replies.length > 0 && (
-                <div className="mt-1 space-y-3">
+            {/* Recursive Recursive Replies */}
+            {showReplies && replies.length > 0 && (
+                <div className="ml-8 mt-2 space-y-2 border-l border-cream pl-4">
                     {replies.map(reply => (
                         <CommentItem 
                             key={reply.id} 
                             comment={reply} 
                             discussionId={discussionId} 
-                            currentUser={currentUser}
+                            currentUser={currentUser} 
                             onReport={onReport}
-                            depth={depth + 1} 
+                            depth={depth + 1}
                         />
                     ))}
                 </div>
             )}
         </div>
     );
-}
+};
 
 
 // Helper icon
