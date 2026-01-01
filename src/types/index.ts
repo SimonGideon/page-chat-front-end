@@ -74,11 +74,13 @@ export interface Comment {
   id: Identifier;
   body: string;
   user: User;
+  user_id: Identifier;
   created_at: string;
   parent_id?: Identifier;
   replies?: Comment[];
   likes_count?: number;
   is_liked?: boolean;
+  status?: string | number;
 }
 
 export interface Discussion {
@@ -86,9 +88,11 @@ export interface Discussion {
   title: string;
   body: string;
   user: User;
+  user_id: Identifier;
   comments: Comment[];
   comments_count?: number;
   recent_commenters?: { id: Identifier; first_name: string; avatar_url?: string }[];
   created_at: string;
   book?: Book;
+  status?: string | number;
 }

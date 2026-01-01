@@ -87,4 +87,8 @@ export const apiClient = {
     const response = await axiosInstance.patch(`/notifications/mark_all_as_read`);
     return response.data;
   },
+  reportContent: async (data: { reportable_id: string | number; reportable_type: "Discussion" | "Comment"; reason: string }) => {
+    const response = await axiosInstance.post(`/reports`, { report: data });
+    return response.data;
+  },
 };
