@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Document, Page, pdfjs } from "react-pdf";
-import { ChevronLeft, ChevronRight, BookOpen, Clock, Heart } from "lucide-react";
+import { ChevronLeft, ChevronRight, BookOpen, Clock, Heart, Twitter, Facebook, Instagram, Linkedin, Globe, Link as LinkIcon, Youtube } from "lucide-react";
 import { NavBar } from "@/components";
 import type { Book } from "@/types";
 import { apiClient } from "@/services/api";
@@ -202,6 +202,36 @@ const ReadBook = () => {
                 <p className="text-lg sm:text-xl md:text-2xl text-charcoal/60 italic font-serif">
                   by {book.author?.name}
                 </p>
+
+                {/* Author Socials */}
+                {book.author?.social_handles && book.author.social_handles.length > 0 && (
+                  <div className="flex items-center gap-3 pt-1">
+                    {book.author.social_handles.map((handle, index) => {
+                      const platform = handle.platform?.toLowerCase() || "";
+                      let Icon = LinkIcon;
+                      
+                      if (platform.includes("twitter") || platform.includes("x.com")) Icon = Twitter;
+                      else if (platform.includes("facebook")) Icon = Facebook;
+                      else if (platform.includes("instagram")) Icon = Instagram;
+                      else if (platform.includes("linkedin")) Icon = Linkedin;
+                      else if (platform.includes("youtube")) Icon = Youtube;
+                      else if (platform.includes("website") || platform.includes("blog")) Icon = Globe;
+
+                      return (
+                        <a
+                          key={index}
+                          href={handle.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 rounded-full bg-white border border-cream text-charcoal/60 hover:text-downy hover:border-downy/30 transition-all hover:-translate-y-0.5"
+                          title={handle.platform || "Social Link"}
+                        >
+                          <Icon className="w-4 h-4" />
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
                 
                 <p className="text-base sm:text-lg text-charcoal/80 max-w-xl leading-relaxed line-clamp-4">
                   {book.description || "No description available for this book."}
