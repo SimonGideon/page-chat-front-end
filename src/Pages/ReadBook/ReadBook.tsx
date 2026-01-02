@@ -132,7 +132,11 @@ const ReadBook = () => {
   };
 
   const handleStartReading = () => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (scrollRef.current) {
+        const yOffset = -100; // Offset for sticky header
+        const y = scrollRef.current.getBoundingClientRect().top + window.scrollY + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+    }
   };
   
   const handleToggleFavorite = async () => {

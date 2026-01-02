@@ -91,4 +91,16 @@ export const apiClient = {
     const response = await axiosInstance.post(`/reports`, { report: data });
     return response.data;
   },
+  deleteDiscussion: async (discussionId: string | number, reason?: string) => {
+    const response = await axiosInstance.delete(`/books/na/discussions/${discussionId}`, {
+      data: { reason }
+    });
+    return response.data;
+  },
+  deleteComment: async (commentId: string | number, reason?: string) => {
+    const response = await axiosInstance.delete(`/books/na/discussions/na/comments/${commentId}`, {
+         data: { reason }
+    });
+    return response.data;
+  },
 };
