@@ -1,8 +1,16 @@
 export type Identifier = string | number;
 
+export interface SocialHandle {
+  platform: string;
+  url: string;
+}
+
 export interface Author {
   id?: Identifier;
   name: string;
+  biography?: string;
+  avatar_url?: string;
+  social_handles?: SocialHandle[];
 }
 
 export interface Category {
