@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { NavBar } from "@/components";
 import { BooksList, HeroSection, Recommendations } from "./components";
@@ -74,9 +76,19 @@ import GlobalDropdown, {
 
 const Home = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { books, loading, error } = useAppSelector((state) => state.featured);
   const [languages, setLanguages] = useState<DropdownOption[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
 
   useEffect(() => {
     const fetchLanguages = async () => {
@@ -92,9 +104,12 @@ const Home = () => {
 
   useEffect(() => {
     dispatch(
-      fetchFeaturedBooks(selectedLanguage ? { language: selectedLanguage } : undefined)
+      fetchFeaturedBooks({
+        language: selectedLanguage || undefined,
+        q: debouncedQuery || undefined,
+      })
     );
-  }, [dispatch, selectedLanguage]);
+  }, [dispatch, selectedLanguage, debouncedQuery]);
 
   const handleTitleLength = (bookTitle: string) => {
     return bookTitle.length > 20 ? `${bookTitle.slice(0, 20)}...` : bookTitle;
@@ -102,7 +117,10 @@ const Home = () => {
 
   const handleRetry = () => {
     dispatch(
-      fetchFeaturedBooks(selectedLanguage ? { language: selectedLanguage } : undefined)
+      fetchFeaturedBooks({
+        language: selectedLanguage || undefined,
+        q: debouncedQuery || undefined,
+      })
     );
   };
 
@@ -120,8 +138,45 @@ const Home = () => {
       <div className="container space-y-6 pt-6">
         <div className="layout-container flex h-full flex-col gap-6">
           <HeroSection />
-          <div className="flex justify-end">
-            <div className="w-64">
+          <div className="flex flex-col md:flex-row justify-end gap-4">
+            <div className="relative w-full md:w-64">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-charcoal/50">
+                <Search className="h-4 w-4" />
+              </div>
+              <input
+                type="text"
+                className="block w-full rounded-xl border border-[#f1e7d2] bg-white py-2.5 pl-10 pr-4 text-sm text-charcoal focus:border-downy focus:outline-none focus:ring-1 focus:ring-downy placeholder:text-charcoal/40"
+                placeholder="Search title, author, genre..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {debouncedQuery && (
+                <div className="absolute top-full left-0 right-0 mt-2 max-h-96 overflow-y-auto rounded-xl border border-[#f1e7d2] bg-white shadow-xl z-50">
+                   {loading ? (
+                       <div className="p-4 text-center text-sm text-charcoal/50">Searching...</div>
+                   ) : books.length > 0 ? (
+                       <ul className="divide-y divide-[#f1e7d2]/50">
+                           {books.slice(0, 10).map((book) => (
+                               <li 
+                                   key={book.id} 
+                                   onClick={() => navigate(`/read/${book.id}`)}
+                                   className="flex items-center gap-3 p-3 hover:bg-downy-lightest cursor-pointer transition-colors"
+                               >
+                                   <img src={book.cover_image_url} alt={book.title} className="h-12 w-8 object-cover rounded shadow-sm" />
+                                   <div>
+                                       <h4 className="text-sm font-semibold text-charcoal line-clamp-1">{book.title}</h4>
+                                       <p className="text-xs text-charcoal/60">by {book.author.name}</p>
+                                   </div>
+                               </li>
+                           ))}
+                       </ul>
+                   ) : (
+                       <div className="p-4 text-center text-sm text-charcoal/50">No results found for "{debouncedQuery}"</div>
+                   )}
+                </div>
+              )}
+            </div>
+            <div className="w-full md:w-64">
               <GlobalDropdown
                 options={languages}
                 name="language"
