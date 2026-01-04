@@ -5,6 +5,9 @@ import type { Comment, Identifier } from "@/types";
 import { apiClient } from "@/services/api";
 import { formatRelativeTime } from "@/lib/utils";
 import { SimpleMoreMenu } from "./SimpleMoreMenu";
+import { MentionPicker } from "./MentionPicker";
+import { renderContentWithMentions } from "./mentionRenderer";
+import type { User } from "@/types";
 
 export const CommentItem = ({ 
   comment, 
@@ -29,6 +32,34 @@ export const CommentItem = ({
     const [replyText, setReplyText] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [showEmoji, setShowEmoji] = useState(false);
+
+    // Mention State for Reply
+    const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        setReplyText(val);
+
+        const cursorPos = e.target.selectionStart || 0;
+        const textBeforeCursor = val.slice(0, cursorPos);
+        const words = textBeforeCursor.split(/\s/);
+        const lastWord = words[words.length - 1];
+
+        if (lastWord.startsWith("@") && lastWord.length > 1) {
+           setMentionQuery(lastWord.slice(1));
+        } else {
+           setMentionQuery(null);
+        }
+    };
+
+    const handleMentionSelect = (user: User) => {
+        if (!mentionQuery) return;
+        const mentionTag = `@[${user.first_name} ${user.last_name}](${user.id}) `;
+        
+        const regex = new RegExp(`@${mentionQuery}$`);
+        setReplyText(prev => prev.replace(regex, mentionTag));
+        setMentionQuery(null);
+    };
 
     // Update local replies if props change
     useEffect(() => {
@@ -131,7 +162,7 @@ export const CommentItem = ({
                     </div>
                     
                     <p className={`text-charcoal/80 leading-relaxed text-sm ${isHidden ? "italic text-charcoal/40" : ""}`}>
-                        {comment.body}
+                        {renderContentWithMentions(comment.body)}
                     </p>
                     
                     {/* Actions */}
@@ -177,10 +208,18 @@ export const CommentItem = ({
 
             {/* Inline Reply Form */}
             {isReplying && (
-                <form onSubmit={handleSendReply} className="ml-11 flex gap-2 animate-in slide-in-from-top-2 duration-200 mt-2">
+                <form onSubmit={handleSendReply} className="ml-11 flex gap-2 animate-in slide-in-from-top-2 duration-200 mt-2 relative">
+                    {mentionQuery && (
+                        <MentionPicker 
+                            query={mentionQuery} 
+                            onSelect={handleMentionSelect} 
+                            onClose={() => setMentionQuery(null)}
+                            position={{ top: 0, left: 0 }}
+                        />
+                    )}
                     <input 
                         value={replyText}
-                        onChange={e => setReplyText(e.target.value)}
+                        onChange={handleInputChange}
                         placeholder="Write a reply..."
                         className="flex-1 px-3 py-1.5 text-sm bg-white border border-cream rounded-lg focus:outline-none focus:border-downy"
                         autoFocus
