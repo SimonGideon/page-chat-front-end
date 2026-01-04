@@ -37,17 +37,7 @@ const HeroSection = () => {
             Browse Collections
           </button>
         </div>
-        <label className="flex h-14 min-w-40 w-full max-w-[520px] flex-col @[480px]:h-16 ">
-          <div className="flex w-full flex-1 items-stretch rounded-xl h-full">
-            <input
-              placeholder="Search for books, authors, or genres"
-              className="form-input flex w-full min-w-0 flex-1 rounded-l-xl border border-[#f0d9b5] bg-white/90 px-4 text-sm font-normal text-charcoal placeholder:text-charcoal/60 shadow-[0_10px_40px_rgba(34,34,34,0.08)] focus:border-downy focus:outline-none focus:ring-0 @[480px]:text-base"
-            />
-            <div className="flex h-full cursor-pointer items-center justify-center rounded-r-xl border border-l-0 border-[#e4d5bb] bg-downy p-2 text-white transition hover:bg-downy-dark">
-              <Search />
-            </div>
-          </div>
-        </label>
+        
         <div className="flex flex-wrap gap-4">
           {[
             { label: "New Arrivals", value: "48 titles" },
