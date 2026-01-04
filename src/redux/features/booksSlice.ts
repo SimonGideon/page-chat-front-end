@@ -22,7 +22,7 @@ const resolveErrorMessage = (payload?: ApiError, fallback?: string | null) =>
 
 export const fetchBooks = createAsyncThunk<
   Book[],
-  { language?: string } | void,
+  { language?: string; q?: string } | void,
   { rejectValue: ApiError }
 >("books/fetchBooks", async (params, thunkAPI) => {
   try {
@@ -40,7 +40,7 @@ export const fetchBooks = createAsyncThunk<
 
 export const fetchFeaturedBooks = createAsyncThunk<
   Book[],
-  { language?: string } | void,
+  { language?: string; q?: string } | void,
   { rejectValue: ApiError }
 >("books/fetchFeaturedBooks", async (params, thunkAPI) => {
   try {
@@ -59,7 +59,7 @@ export const fetchFeaturedBooks = createAsyncThunk<
 
 export const fetchRecommendedBooks = createAsyncThunk<
   Book[],
-  { language?: string } | void,
+  { language?: string; q?: string } | void,
   { rejectValue: ApiError }
 >("books/fetchRecommendedBooks", async (params, thunkAPI) => {
   try {
