@@ -161,8 +161,22 @@ export const CommentItem = ({
                         )}
                     </div>
                     
-                    <p className={`text-charcoal/80 leading-relaxed text-sm ${isHidden ? "italic text-charcoal/40" : ""}`}>
-                        {renderContentWithMentions(comment.body)}
+                    <p className={`text-charcoal/80 leading-relaxed text-sm`}>
+                        {isHidden ? (
+                            <span className="italic text-charcoal/40 flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-red-400"></span>
+                                This content has been hidden due to valid safety concerns.
+                            </span>
+                        ) : (
+                            <>
+                                {(comment as any).status === "flagged" && (
+                                    <span className="inline-block text-[10px] bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded mr-2 align-middle border border-yellow-200">
+                                        Flagged
+                                    </span>
+                                )}
+                                {renderContentWithMentions(comment.body)}
+                            </>
+                        )}
                     </p>
                     
                     {/* Actions */}
