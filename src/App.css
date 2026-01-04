@@ -1,42 +1,73 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.login-banner {
+  background-color: rgba(252, 253, 252, 255);
+}
+.pdf-page canvas {
+  width: 100% !important;
+  height: auto !important;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.react-pdf__Page__canvas {
+  display: block;
+  margin: 2rem auto;
+  max-width: 100%;
+  width: auto;
 }
 
-@keyframes logo-spin {
+.doc-popup::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* loader */
+.pulse {
+  position: relative;
+  height: 112px;
+  width: 112px;
+}
+
+.pulse:before,
+.pulse:after {
+  border-radius: 50%;
+  content: "";
+  position: absolute;
+}
+
+.pulse:before {
+  background: #ff6d1f;
+  height: 22.4px;
+  width: 22.4px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.pulse:after {
+  animation: pulse-t3pv1p 1.5s infinite;
+  border: 11.2px solid #ff6d1f;
+  height: 100%;
+  width: 100%;
+}
+
+.cartegory-pic {
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+.profile-activity ul li {
+  padding: 1.2rem;
+
+  &:hover {
+    color: #ff6d1f;
+  }
+}
+@keyframes pulse-t3pv1p {
   from {
-    transform: rotate(0deg);
+    opacity: 1;
+    transform: scale(0);
   }
+
   to {
-    transform: rotate(360deg);
+    opacity: 0;
+    transform: scale(1);
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
