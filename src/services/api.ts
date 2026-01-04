@@ -9,6 +9,10 @@ export const apiClient = {
     const response = await axiosInstance.get<T>(url);
     return response.data;
   },
+  getUsers: async (query: string) => {
+    const response = await axiosInstance.get<{ data: any[] }>(`/users?q=${query}`);
+    return response.data;
+  },
   getLanguages: async () => {
     const response = await axiosInstance.get<{
       data: { text: string; value: string }[];

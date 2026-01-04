@@ -12,6 +12,9 @@ import { CommentItem } from "./CommentItem";
 import { DeleteReasonModal } from "./DeleteReasonModal";
 import { SimpleMoreMenu } from "./SimpleMoreMenu";
 import { ChevronLeftIcon } from "./Icons";
+import { MentionPicker } from "./MentionPicker";
+import { renderContentWithMentions } from "./mentionRenderer";
+import type { User } from "@/types";
 
 const getTwoNames = (user: any) => {
   if (!user) return "Anonymous";
@@ -57,6 +60,11 @@ export const DiscussionView = ({
   // Delete Modal State
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{ type: 'discussion' | 'comment', id: string | number } | null>(null);
+
+  // Mention State
+  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+  const [mentionPosition, setMentionPosition] = useState({ top: 0, left: 0 }); // Placeholder for now, simplistic positioning
+
 
   const isAdmin = currentUser?.role === 'admin' || currentUser?.role === 1;
 
@@ -161,6 +169,36 @@ export const DiscussionView = ({
       setPage(nextPage);
       fetchComments(nextPage);
     }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setCommentText(val);
+
+    // Simple mention trigger detection (last word starts with @)
+    const cursorPos = e.target.selectionStart || 0;
+    const textBeforeCursor = val.slice(0, cursorPos);
+    const words = textBeforeCursor.split(/\s/);
+    const lastWord = words[words.length - 1];
+
+    if (lastWord.startsWith("@") && lastWord.length > 1) {
+       setMentionQuery(lastWord.slice(1));
+    } else {
+       setMentionQuery(null);
+    }
+  };
+
+  const handleMentionSelect = (user: User) => {
+      if (!mentionQuery) return;
+      const mentionTag = `@[${user.first_name} ${user.last_name}](${user.id}) `;
+      
+      // Replace last occurrence of @query
+      const regex = new RegExp(`@${mentionQuery}$`);
+      setCommentText(prev => prev.replace(regex, mentionTag));
+      setMentionQuery(null);
+      
+      // Focus back (hacky)
+      // document.getElementById('comment-input')?.focus();
   };
 
   const handleSendComment = async (e: React.FormEvent) => {
@@ -281,7 +319,9 @@ export const DiscussionView = ({
             </h1>
             
             <div className="prose prose-sm max-w-none text-charcoal/80 leading-relaxed font-serif text-sm">
-                <p className={`whitespace-pre-wrap ${isHidden ? "italic text-charcoal/40" : ""}`}>{discussion.body}</p>
+                <p className={`whitespace-pre-wrap ${isHidden ? "italic text-charcoal/40" : ""}`}>
+                  {renderContentWithMentions(discussion.body)}
+                </p>
             </div>
 
             <div className="flex items-center gap-2 mb-4 px-2 mt-6">
@@ -327,9 +367,17 @@ export const DiscussionView = ({
       {/* Comment Input */}
       <form onSubmit={handleSendComment} className="mt-auto p-4 bg-white border-t border-cream">
         <div className="relative">
+          {mentionQuery && (
+              <MentionPicker 
+                query={mentionQuery} 
+                onSelect={handleMentionSelect} 
+                onClose={() => setMentionQuery(null)}
+                position={{ top: 0, left: 0 }}
+              />
+          )}
           <input
             value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
+            onChange={handleInputChange}
             placeholder="Type a comment..."
             className="w-full pl-4 pr-24 py-3 bg-cream/20 border border-cream rounded-xl focus:outline-none focus:border-downy focus:ring-1 focus:ring-downy transition-all text-sm"
           />
