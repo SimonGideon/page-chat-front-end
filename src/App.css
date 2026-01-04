@@ -34,7 +34,7 @@
 }
 
 .pulse:before {
-  background: #2e9cbb;
+  background: #ff6d1f;
   height: 22.4px;
   width: 22.4px;
   top: 50%;
@@ -44,7 +44,7 @@
 
 .pulse:after {
   animation: pulse-t3pv1p 1.5s infinite;
-  border: 11.2px solid #2e9cbb;
+  border: 11.2px solid #ff6d1f;
   height: 100%;
   width: 100%;
 }
@@ -57,7 +57,7 @@
   padding: 1.2rem;
 
   &:hover {
-    color: #ee3730;
+    color: #ff6d1f;
   }
 }
 @keyframes pulse-t3pv1p {

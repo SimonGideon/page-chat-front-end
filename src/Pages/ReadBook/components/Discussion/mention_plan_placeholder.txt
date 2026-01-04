@@ -1,0 +1,5 @@
+
+// Helper component for mention logic?
+// Maybe better to keep it inline or use a hook first.
+// I'll create a `useMentions` hook or similar if logic gets complex.
+// For now, I'll update the apiClient to support the search first.

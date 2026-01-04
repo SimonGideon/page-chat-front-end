@@ -31,11 +31,24 @@ const Recommendations = () => {
   }
 
   return (
-    <aside className="shadow-lg shadow-bunker-300 px-6 my-10 rounded-xl md:min-w-64 text-left">
-      <h2 className="py-6 font-semibold text-lg">Recommended</h2>
-      <div className="flex flex-col justify-items-center text-left gap-4 pb-6">
+    <aside className="relative my-10 rounded-3xl border border-[#f1e7d2] bg-white px-6 text-left shadow-[0_25px_120px_rgba(34,34,34,0.04)] md:min-w-64">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-downy to-transparent" />
+      <div className="flex flex-col gap-2 py-6">
+        <span className="text-xs font-semibold uppercase tracking-[0.25em] text-downy-dark">
+          Recommended
+        </span>
+        <h2 className="text-xl font-semibold text-charcoal">
+          Shelf just for you
+        </h2>
+        <p className="text-sm text-charcoal/70">
+          Curated with your recent reading patterns.
+        </p>
+      </div>
+      <div className="flex flex-col justify-items-center gap-4 pb-6 text-left">
         {recommendedBooks.length === 0 ? (
-          <p className="text-bunker-400">No recommended books</p>
+          <p className="rounded-2xl border border-dashed border-downy/30 bg-downy-lightest/60 p-4 text-sm text-charcoal/70">
+            No recommended books
+          </p>
         ) : (
           recommended.map((book, index) => (
             <Book

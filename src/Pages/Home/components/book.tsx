@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
+import { useAppSelector } from "@/redux/hooks";
 import type { Book as BookType } from "@/types";
 
 import BookDetails from "./bookDetailsPop";
@@ -21,13 +23,23 @@ type BookProps = {
 };
 
 const Book = ({ book, onTitleLength, styleProps, index }: BookProps) => {
+  const navigate = useNavigate();
+  const { user } = useAppSelector((state) => state.auth);
   const [showBookDetails, setShowBookDetails] = useState(false);
+
+  const handleBookClick = () => {
+    if (user) {
+      navigate(`/read/${book.id}`);
+    } else {
+      setShowBookDetails(true);
+    }
+  };
 
   return (
     <div>
       <div
         className={`cursor-pointer ${styleProps.containerClass ?? ""}`}
-        onClick={() => setShowBookDetails(true)}
+        onClick={handleBookClick}
       >
         <img
           src={book.cover_image_url}

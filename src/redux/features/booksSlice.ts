@@ -22,11 +22,13 @@ const resolveErrorMessage = (payload?: ApiError, fallback?: string | null) =>
 
 export const fetchBooks = createAsyncThunk<
   Book[],
-  void,
+  { language?: string; q?: string } | void,
   { rejectValue: ApiError }
->("books/fetchBooks", async (_, thunkAPI) => {
+>("books/fetchBooks", async (params, thunkAPI) => {
   try {
-    const response = await axiosInstance.get<{ data: Book[] }>("/books");
+    const response = await axiosInstance.get<{ data: Book[] }>("/books", {
+      params,
+    });
     return response.data.data;
   } catch (error) {
     const apiError =
@@ -38,12 +40,13 @@ export const fetchBooks = createAsyncThunk<
 
 export const fetchFeaturedBooks = createAsyncThunk<
   Book[],
-  void,
+  { language?: string; q?: string } | void,
   { rejectValue: ApiError }
->("books/fetchFeaturedBooks", async (_, thunkAPI) => {
+>("books/fetchFeaturedBooks", async (params, thunkAPI) => {
   try {
     const response = await axiosInstance.get<{ data: Book[] }>(
-      "/books/featured"
+      "/books/featured",
+      { params }
     );
     return response.data.data;
   } catch (error) {
@@ -56,12 +59,13 @@ export const fetchFeaturedBooks = createAsyncThunk<
 
 export const fetchRecommendedBooks = createAsyncThunk<
   Book[],
-  void,
+  { language?: string; q?: string } | void,
   { rejectValue: ApiError }
->("books/fetchRecommendedBooks", async (_, thunkAPI) => {
+>("books/fetchRecommendedBooks", async (params, thunkAPI) => {
   try {
     const response = await axiosInstance.get<{ data: Book[] }>(
-      "/books/recommended"
+      "/books/recommended",
+      { params }
     );
     return response.data.data;
   } catch (error) {

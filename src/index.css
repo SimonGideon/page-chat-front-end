@@ -5,4 +5,7 @@
 
 body {
   font-family: "Poppins", sans-serif;
+  background-color: #ffffff;
+  color: #222222;
+  min-height: 100vh;
 }

@@ -16,11 +16,15 @@
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",
     "@radix-ui/react-toast": "^1.1.5",
+    "@rails/actioncable": "^8.1.100",
     "@reduxjs/toolkit": "^2.2.5",
     "activestorage": "^5.2.8-1",
     "axios": "^1.7.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "emoji-picker-react": "^4.16.1",
+    "lucide-react": "^0.555.0",
     "pdfjs-dist": "^4.5.136",
     "react": "^18.2.0",
     "react-confetti": "^6.1.0",
@@ -39,6 +43,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/rails__actioncable": "^8.0.3",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@typescript-eslint/eslint-plugin": "^8.13.0",

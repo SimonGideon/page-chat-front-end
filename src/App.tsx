@@ -1,5 +1,15 @@
 import React from "react";
-import { Home, Login, PageChat, Profile } from "./Pages";
+import {
+  ActivateAccount,
+  ForgotPassword,
+  Home,
+  Login,
+  PageChat,
+  Profile,
+  ResetPassword,
+  SignUp,
+  ReadBook,
+} from "./Pages";
 import { Favorite, Announcements, Settings } from "./Pages/Profile/components";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -18,6 +28,22 @@ const App = () => {
       element: <Login />,
     },
     {
+      path: "/signup",
+      element: <SignUp />,
+    },
+    {
+      path: "/forgot-password",
+      element: <ForgotPassword />,
+    },
+    {
+      path: "/reset-password",
+      element: <ResetPassword />,
+    },
+    {
+      path: "/activate-account",
+      element: <ActivateAccount />,
+    },
+    {
       path: "/profile",
       element: <Profile />,
       children: [
@@ -30,16 +56,36 @@ const App = () => {
           element: <Settings />,
         },
         {
-          index: true,
+          path: "favorites",
           element: <Favorite />,
+        },
+        {
+          path: "reviews",
+          element: <Favorite />, // Using placeholder or wrapper if Reviews component needs props
+        },
+        {
+          path: "engagements",
+          element: <Favorite />, // Placeholder
+        },
+        {
+          index: true,
+          element: <Favorite />, 
         },
       ],
     },
     {
-      path: "/page-chat",
+      path: "/dashboard",
       element: (
         <ProtectedRoute>
           <PageChat />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/read/:id",
+      element: (
+        <ProtectedRoute>
+          <ReadBook />
         </ProtectedRoute>
       ),
     },
