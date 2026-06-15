@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import { login } from "@/redux/features/authSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import GoogleAuthButton from "@/components/GoogleAuthButton";
 import {
   Button,
   Form,
@@ -158,6 +159,15 @@ const LoginForm = () => {
         >
           {form.formState.isSubmitting ? "Logging in..." : "Login"}
         </Button>
+        {/* ── Divider ──────────────────────────────────────────── */}
+        <div className="relative flex items-center gap-3">
+          <div className="h-px flex-1 bg-[#efe6da]" />
+          <span className="text-xs text-charcoal/40">or continue with</span>
+          <div className="h-px flex-1 bg-[#efe6da]" />
+        </div>
+
+        <GoogleAuthButton label="Sign in with Google" />
+
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex gap-4">
             <Link

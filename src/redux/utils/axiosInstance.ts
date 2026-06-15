@@ -3,8 +3,10 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from "axios";
 
+import { apiBaseUrl } from "@/lib/config";
+
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: "http://localhost:3000/api/v1",
+  baseURL: apiBaseUrl,
   headers: {
     "Content-Type": "application/json",
   },

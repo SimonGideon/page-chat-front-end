@@ -114,7 +114,13 @@ const authSlice = createSlice({
       localStorage.removeItem("token");
     },
     setUser: (state, action) => {
-       state.user = action.payload;
+      state.user = action.payload;
+    },
+    // Used by the Google OAuth callback page to store the JWT that
+    // the backend appends to the redirect URL as ?token=...
+    setToken: (state, action) => {
+      state.token = action.payload;
+      localStorage.setItem("token", action.payload);
     },
   },
   extraReducers: (builder) => {
@@ -161,6 +167,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, setUser } = authSlice.actions;
+export const { logout, setUser, setToken } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -43,7 +43,7 @@ const Book = ({ book, onTitleLength, styleProps, index }: BookProps) => {
       >
         <img
           src={book.cover_image_url}
-          className={`object-cover ${styleProps.imageClass ?? ""}`}
+          className={styleProps.imageClass ?? "w-full aspect-[2/3] object-cover rounded-xl"}
           alt={book.title}
         />
         <p

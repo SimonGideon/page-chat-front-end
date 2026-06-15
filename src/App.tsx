@@ -10,6 +10,8 @@ import {
   SignUp,
   ReadBook,
 } from "./Pages";
+import GoogleAuthCallback from "./Pages/Auth/GoogleAuthCallback";
+import CompleteProfile from "./Pages/Auth/CompleteProfile";
 import { Favorite, Announcements, Settings } from "./Pages/Profile/components";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -42,6 +44,18 @@ const App = () => {
     {
       path: "/activate-account",
       element: <ActivateAccount />,
+    },
+    {
+      // Google redirects back to /auth/google/callback?token=<JWT>
+      // This page reads the token and logs the user in
+      path: "/auth/google/callback",
+      element: <GoogleAuthCallback />,
+    },
+    {
+      // Google users with incomplete profiles land here to fill in
+      // phone, address, country, city, gender, date of birth
+      path: "/complete-profile",
+      element: <CompleteProfile />,
     },
     {
       path: "/profile",

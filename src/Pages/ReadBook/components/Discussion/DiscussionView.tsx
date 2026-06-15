@@ -3,6 +3,8 @@ import { MessageSquare, Send, Smile, Plus, ChevronDown, ChevronUp } from "lucide
 import EmojiPicker from "emoji-picker-react";
 import { createConsumer } from "@rails/actioncable";
 
+import { actionCableUrl } from "@/lib/config";
+
 import type { Discussion, Comment, Identifier } from "@/types";
 import { apiClient } from "@/services/api";
 import { useAppSelector } from "@/redux/hooks";
@@ -113,7 +115,7 @@ export const DiscussionView = ({
   useEffect(() => {
     if (!token) return;
 
-    const cable = createConsumer(`ws://localhost:3000/cable?token=${token}`); 
+    const cable = createConsumer(actionCableUrl(token)); 
     
     // Only subscribe to the specific discussion channel
     const subscription = cable.subscriptions.create(

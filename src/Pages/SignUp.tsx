@@ -19,6 +19,7 @@ import {
 } from "@/components/ui";
 import GlobalDropdown from "@/components/ui/GlobalDropdown";
 import axiosInstance from "@/redux/utils/axiosInstance";
+import GoogleAuthButton from "@/components/GoogleAuthButton";
 
 const SignUpSchema = z.object({
   first_name: z.string().min(2, "First name is required"),
@@ -346,6 +347,21 @@ const SignUp = () => {
             your account and set a secure password.
           </p>
         </div>
+        {/* ── Google sign-up (fastest path) ───────────────────────────────── */}
+        <div className="space-y-3">
+          <GoogleAuthButton label="Sign up with Google" />
+          <p className="text-center text-xs text-charcoal/50">
+            New to Page Chat? Google will create your account instantly — no form needed.
+          </p>
+        </div>
+
+        {/* ── Divider ──────────────────────────────────────────────────────── */}
+        <div className="relative flex items-center gap-3">
+          <div className="h-px flex-1 bg-[#efe6da]" />
+          <span className="text-xs text-charcoal/40">or sign up with email</span>
+          <div className="h-px flex-1 bg-[#efe6da]" />
+        </div>
+
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}

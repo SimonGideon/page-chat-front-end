@@ -10,15 +10,11 @@ type BooksCategoryDisplayProps = {
 
 const BooksCategoryDisplay = ({ data }: BooksCategoryDisplayProps) => {
   const categories: Record<string, CategoryWithBooks> = {};
-  const categoryColors = ["bg1_category", "bg2_category", "bg3_category"];
 
   data.forEach((book) => {
     const categoryId = String(book.category.id);
     if (!categories[categoryId]) {
-      categories[categoryId] = {
-        ...book.category,
-        books: [],
-      };
+      categories[categoryId] = { ...book.category, books: [] };
     }
     categories[categoryId].books.push(book);
   });
@@ -26,13 +22,12 @@ const BooksCategoryDisplay = ({ data }: BooksCategoryDisplayProps) => {
   const categoryArray = Object.values(categories).slice(0, 4);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      {categoryArray.map((category, index) => (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-1">
+      {categoryArray.map((category) => (
         <BookCategoryCard
           key={category.id}
           category={category}
           books={category.books}
-          bg={categoryColors[index] || "bg-default"}
         />
       ))}
     </div>

@@ -39,7 +39,7 @@ const BooksList = ({ books, onTitleLength }: BooksListProps) => {
         <p className="pt-3 text-charcoal/70">Featured Categories</p>
         <BooksCategoryDisplay data={books} />
       </div>
-      <div className="grid grid-cols-2 justify-items-center gap-4 pt-5 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-4 pt-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {chosen.map((book) => (
           <Book
             key={book.id}
@@ -47,12 +47,12 @@ const BooksList = ({ books, onTitleLength }: BooksListProps) => {
             onTitleLength={onTitleLength}
             index={0}
             styleProps={{
+              containerClass: "group cursor-pointer flex flex-col gap-2",
               imageClass:
-                "w-48 md:w-52 sm:max-h-45 md:max-h-72 object-cover rounded-xl",
-              textClass: "text-bunker-400",
-              containerClass: "cursor-pointer",
-              textTitle: "text-bunker-950 font-semibold",
-              textAuthor: "text-sm",
+                "w-full aspect-[2/3] object-cover rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-[1.02] transition-all duration-300",
+              textClass: "space-y-0.5",
+              textTitle: "text-sm font-semibold text-charcoal line-clamp-2 leading-snug",
+              textAuthor: "text-xs text-charcoal/60",
             }}
           />
         ))}

@@ -3,6 +3,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { createConsumer } from "@rails/actioncable";
 
 import { Loader } from "@/components";
+import { actionCableUrl } from "@/lib/config";
 import { getCurrentUser } from "@/redux/features/authSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useToast } from "@/components/ui/use-toast";
@@ -29,7 +30,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   useEffect(() => {
     if (!user || !token) return;
 
-    const cable = createConsumer(`ws://localhost:3000/cable?token=${token}`);
+    const cable = createConsumer(actionCableUrl(token));
     
     const subscription = cable.subscriptions.create(
       { channel: "NotificationChannel" },
