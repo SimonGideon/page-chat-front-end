@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Deployment/local artifacts
+/.dockerignore
+/Dockerfile
+/nginx.conf
